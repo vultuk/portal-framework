@@ -1,0 +1,28 @@
+{
+    "name": "portal/framework",
+    "description": "The Portal Framework.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simon Skinner",
+            "email": "s.skinner@contactrate.co.uk"
+        },
+        {
+            "name": "James Read",
+            "email": "j.read@contactrate.co.uk"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "autoload": {
+        "classmap": [],
+        "files": [],
+        "psr-4": {
+            "IlluminateExtensions\\": "src/Illuminate/",
+            "Portal\\": "src/Portal/"
+        }
+    }
+
+}
