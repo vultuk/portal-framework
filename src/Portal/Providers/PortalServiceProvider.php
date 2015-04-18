@@ -1,5 +1,6 @@
 <?php namespace Portal\Providers;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 
 class PortalServiceProvider extends ServiceProvider {
@@ -39,7 +40,11 @@ class PortalServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        // TODO: Implement register() method.
+        $loader = AliasLoader::getInstance();
+
+        $loader->alias('Illuminate\Routing\Controller', 'IlluminateExtensions\Routing\Controller');
+
+
     }
 
 
