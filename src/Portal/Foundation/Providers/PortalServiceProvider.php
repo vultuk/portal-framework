@@ -1,6 +1,10 @@
-<?php namespace Portal\Providers;
+<?php namespace Portal\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Portal\Scripts\Contracts\ReportRepository;
+use Portal\Scripts\Repositories\Report\CachedReportRepository;
+use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
+use Portal\Scripts\Repositories\Report\OldTransformReportRepository;
 
 class PortalServiceProvider extends ServiceProvider {
 
@@ -8,7 +12,7 @@ class PortalServiceProvider extends ServiceProvider {
         'app.routes',
     ];
 
-    protected $resourcesDirectory = '/../../../';
+    protected $resourcesDirectory = '/../../../../';
 
 
     /**
@@ -39,8 +43,23 @@ class PortalServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        // TODO: Implement register() method.
+        $this->bindSurveys();
     }
+
+
+    protected function bindSurveys()
+    {
+        $this->app->bind(ReportRepository::class, function() {
+            $report = new OldEloquentReportRepository();
+            $report = new OldTransformReportRepository($report);
+
+            $report = new CachedReportRepository($report, $this->app['cache.store']);
+
+            return $report;
+        });
+    }
+
+
 
 
     /**
@@ -68,7 +87,6 @@ class PortalServiceProvider extends ServiceProvider {
         {
             // Find the real file name
             $fileName = $this->getDirectory($this->resourcesDirectory, 'resources/configs/' . str_replace('.', '/', $configFile) . '.php');
-
 
             // If the config file exists then merge in, otherwise log as an error
             if (file_exists($fileName))
