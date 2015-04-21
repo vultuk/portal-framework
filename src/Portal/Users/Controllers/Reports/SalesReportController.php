@@ -7,7 +7,7 @@ class SalesReportController extends Controller {
 
     public function getIndex()
     {
-        dd("Woopie");
+        return $this->view('users.reports.index');
     }
 
 }

@@ -5,7 +5,7 @@ use Illuminate\View\View;
 
 class SetsThemePath {
 
-    protected $defaultTheme = 'themes.bootstrap';
+    protected $defaultTheme = 'portal::themes.bootstrap.';
 
     public function handle($request, Closure $next)
     {
