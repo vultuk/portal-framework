@@ -2,6 +2,6 @@
 
 return [
     'load' => [
-        'ticket',
+        'users',
     ],
 ];

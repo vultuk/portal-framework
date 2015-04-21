@@ -1,10 +1,8 @@
 <?php namespace IlluminateExtensions\Routing;
 
-abstract class Controller extends ExtendedController {
+use Illuminate\Routing\Controller as IlluminateController;
 
-    public function __construct()
-    {
-        print "I am Extended";
-    }
+abstract class Controller extends IlluminateController
+{
 
 }
