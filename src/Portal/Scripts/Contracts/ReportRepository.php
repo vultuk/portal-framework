@@ -41,4 +41,14 @@ interface ReportRepository
      */
     public function getByQuestionResults(array $questionAndAnswers = null, Carbon $dateFrom = null, Carbon $dateTo = null);
 
+
+    /**
+     * @param integer        $agentId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null);
+
 }

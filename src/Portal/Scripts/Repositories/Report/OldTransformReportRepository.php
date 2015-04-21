@@ -62,4 +62,16 @@ class OldTransformReportRepository implements ReportRepository {
     ) {
         // TODO: Implement getByQuestionResults() method.
     }
+
+    /**
+     * @param integer        $agentId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    {
+        return $this->repository->getSurveyCountByAgentId($agentId, $dateFrom, $dateTo);
+    }
 }

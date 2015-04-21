@@ -2,9 +2,11 @@
 
 use Carbon\Carbon;
 use Illuminate\Cache\Repository as Cache;
+use Portal\Foundation\DateTime\SetsCacheTimeByDateRange;
 use Portal\Scripts\Contracts\ReportRepository;
 
 class CachedReportRepository implements ReportRepository {
+    use SetsCacheTimeByDateRange;
 
     protected $repository = null;
     protected $cache = null;
@@ -26,7 +28,7 @@ class CachedReportRepository implements ReportRepository {
     {
         return $this->cache->remember(
             "countCompletedScripts-{$scriptId}-{$dateFrom}-{$dateTo}",
-            2,
+            $this->getCacheTime($dateFrom, $dateTo),
             function() use ($scriptId, $dateFrom, $dateTo) {
                 return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo);
             }
@@ -56,7 +58,7 @@ class CachedReportRepository implements ReportRepository {
     {
         return $this->cache->remember(
             "getAllScriptResults-{$scriptId}-{$dateFrom}-{$dateTo}",
-            2,
+            $this->getCacheTime($dateFrom, $dateTo),
             function() use ($scriptId, $dateFrom, $dateTo) {
                 return $this->repository->getAllScriptResults($scriptId, $dateFrom, $dateTo);
             }
@@ -76,5 +78,23 @@ class CachedReportRepository implements ReportRepository {
         Carbon $dateTo = null
     ) {
         // TODO: Implement getByQuestionResults() method.
+    }
+
+    /**
+     * @param integer        $agentId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    {
+        return $this->cache->remember(
+            "getSurveyCountByAgentId-{$agentId}-{$dateFrom}-{$dateTo}",
+            $this->getCacheTime($dateFrom, $dateTo),
+            function() use ($agentId, $dateFrom, $dateTo) {
+                return $this->repository->getSurveyCountByAgentId($agentId, $dateFrom, $dateTo);
+            }
+        );
     }
 }
