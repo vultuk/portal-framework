@@ -38,4 +38,22 @@ class OldEloquentReportRepository implements ReportRepository {
     {
         // TODO: Implement getByQuestionResults() method.
     }
+
+    /**
+     * @param integer        $agentId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    {
+        $query = OldSurveyAnswerLog::select('*')
+            ->where('agent_id', $agentId)
+            ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->groupBy('lead_id')
+            ->count();
+
+        return (int)$query;
+    }
 }
