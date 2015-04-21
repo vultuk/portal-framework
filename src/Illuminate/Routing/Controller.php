@@ -1,10 +1,19 @@
 <?php namespace IlluminateExtensions\Routing;
 
-abstract class Controller extends ExtendedController {
+use Illuminate\Routing\Controller as IlluminateController;
 
-    public function __construct()
+abstract class Controller extends IlluminateController
+{
+
+    protected $defaultPageDirectory = 'portal::pages.';
+
+    function __construct()
     {
-        print "I am Extended";
+        $this->middleware('\Portal\Foundation\Http\Middleware\SetsThemePath');
     }
 
+    protected function view($pageName, $vars = [])
+    {
+        return view($this->defaultPageDirectory . $pageName)->with($vars);
+    }
 }

@@ -5,6 +5,8 @@ use Portal\Scripts\Contracts\ReportRepository;
 use Portal\Scripts\Repositories\Report\CachedReportRepository;
 use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
 use Portal\Scripts\Repositories\Report\OldTransformReportRepository;
+use Portal\Users\Contracts\UserRepository;
+use Portal\Users\Repositories\User\OldEloquentUserRepository;
 
 class PortalServiceProvider extends ServiceProvider {
 
@@ -46,6 +48,14 @@ class PortalServiceProvider extends ServiceProvider {
         $this->bindSurveys();
     }
 
+    protected function bindUsers()
+    {
+        $this->app->bind(UserRepository::class, function() {
+            $user = new OldEloquentUserRepository();
+
+            return $user;
+        });
+    }
 
     protected function bindSurveys()
     {
