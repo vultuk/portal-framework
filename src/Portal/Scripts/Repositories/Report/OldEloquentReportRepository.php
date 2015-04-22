@@ -52,10 +52,9 @@ class OldEloquentReportRepository implements ReportRepository {
             ->where('agent_id', $agentId)
             ->whereBetween('created_at', [$dateFrom, $dateTo])
             ->groupBy(DB::raw("DATE(created_at)"))
+            ->orderBy('Date')
             ->get();
 
-        dd($query);
-
-        return (int)$query;
+        return $query;
     }
 }
