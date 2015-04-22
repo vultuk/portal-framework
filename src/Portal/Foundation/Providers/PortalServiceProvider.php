@@ -7,6 +7,7 @@ use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
 use Portal\Scripts\Repositories\Report\OldTransformReportRepository;
 use Portal\Users\Contracts\UserRepository;
 use Portal\Users\Repositories\User\OldEloquentUserRepository;
+use Portal\Users\Repositories\User\OldTransformUserRepository;
 
 class PortalServiceProvider extends ServiceProvider {
 
@@ -45,6 +46,7 @@ class PortalServiceProvider extends ServiceProvider {
      */
     public function register()
     {
+        $this->bindUsers();
         $this->bindSurveys();
     }
 
@@ -52,6 +54,7 @@ class PortalServiceProvider extends ServiceProvider {
     {
         $this->app->bind(UserRepository::class, function() {
             $user = new OldEloquentUserRepository();
+            $user = new OldTransformUserRepository($user);
 
             return $user;
         });

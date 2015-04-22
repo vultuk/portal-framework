@@ -72,6 +72,14 @@ class OldTransformReportRepository implements ReportRepository {
      */
     public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
-        return $this->repository->getSurveyCountByAgentId($agentId, $dateFrom, $dateTo);
+        $results = $this->repository->getSurveyCountByAgentId($agentId, $dateFrom, $dateTo);
+
+        $returnArray = [];
+
+        array_map(function($c) use(&$returnArray) {
+            $returnArray[$c['Date']] = $c['Total'];
+        }, is_null($results) ? [] : $results->toArray());
+
+        return $returnArray;
     }
 }

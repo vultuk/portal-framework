@@ -60,7 +60,7 @@ class OldEloquentUserRepository implements UserRepository
     {
         $userDetails = $this->getUserDetails($userId);
 
-        return $userDetails->agent;
+        return rand(40,120);
     }
 
     /**
