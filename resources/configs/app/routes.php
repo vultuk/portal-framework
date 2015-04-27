@@ -3,5 +3,6 @@
 return [
     'load' => [
         'users',
+        'companies',
     ],
 ];
