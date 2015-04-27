@@ -1,17 +1,16 @@
-<?php namespace Portal\Companies\Models;
+<?php namespace Portal\ContactDetails\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Portal\Companies\Contracts\RecordsCompanyActivity;
+use Portal\Activities\Contracts\RecordsActivity;
 
-class CompanyAddress extends Model {
-    use RecordsCompanyActivity;
+class Address extends Model {
+    use RecordsActivity;
 
     protected $connection = "portal/framework";
 
-    protected $table = "company_addresses";
+    protected $table = "addresses";
 
     protected $fillable = [
-        'company_id',
         'description',
         'address1',
         'address2',
@@ -24,9 +23,9 @@ class CompanyAddress extends Model {
     ];
 
 
-    public function company()
+    public function link()
     {
-        return $this->belongsTo('Portal\Companies\Models\Company');
+        return $this->morphTo();
     }
 
 }

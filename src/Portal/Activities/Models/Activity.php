@@ -1,19 +1,25 @@
-<?php namespace Portal\Companies\Models;
+<?php namespace Portal\Activities\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CompanyActivity extends Model {
+class Activity extends Model {
 
     protected $connection = "portal/framework";
 
-    protected $table = "company_activities";
+    protected $table = "activities";
 
     protected $fillable = [
-        'company_id',
+        'link_id',
+        'link_type',
         'activity_id',
         'activity_type',
         'activity_name',
     ];
+
+    public function link()
+    {
+        return $this->morphTo();
+    }
 
     public function activity()
     {

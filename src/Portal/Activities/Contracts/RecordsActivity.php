@@ -1,11 +1,11 @@
-<?php namespace Portal\Companies\Contracts;
+<?php namespace Portal\Activities\Contracts;
 
-use Portal\Companies\Models\CompanyActivity;
+use Portal\Activities\Models\Activity;
 use ReflectionClass;
 
-trait RecordsCompanyActivity {
+trait RecordsActivity {
 
-    protected static function bootRecordsCompanyActivity()
+    protected static function bootRecordsActivity()
     {
 
         foreach (static::getModelEvents() as $event)
@@ -19,10 +19,10 @@ trait RecordsCompanyActivity {
 
     public function recordEvent($event)
     {
-        $className = strtolower((new ReflectionClass($this))->getShortName());
 
-        CompanyActivity::create([
-            'company_id' => $className == "company" ? $this->id : $this->company_id,
+        Activity::create([
+            'link_id' => isset($this->link_type) ? $this->link_id : $this->id,
+            'link_type' => isset($this->link_type) ? $this->link_type : get_class($this),
             'activity_id' => $this->id,
             'activity_type' => get_class($this),
             'activity_name' => $this->getActivityName($this, $event),

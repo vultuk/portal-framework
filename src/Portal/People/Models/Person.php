@@ -1,21 +1,23 @@
-<?php namespace Portal\Companies\Models;
+<?php namespace Portal\People\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Portal\Activities\Contracts\RecordsActivity;
 
-class Company extends Model {
+class Person extends Model {
     use RecordsActivity;
 
     protected static $recordedEvents = ['created', 'updated'];
 
     protected $connection = "portal/framework";
 
-    protected $table = "companies";
+    protected $table = "people";
 
     protected $fillable = [
-        'name',
-        'slug',
-        'logo',
+        'title',
+        'first_name',
+        'middle_names',
+        'last_name',
+        'date_of_birth',
     ];
 
     public function activity()
