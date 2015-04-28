@@ -38,4 +38,9 @@ class Company extends Model {
         return $this->morphMany('\Portal\ContactDetails\Models\ExtraContactDetail', 'link');
     }
 
+    public function orders()
+    {
+        return $this->morphMany('\Portal\Orders\Models\Order', 'link');
+    }
+
 }

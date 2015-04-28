@@ -50,7 +50,7 @@ class PortalServiceProvider extends ServiceProvider {
     private function bindRouting(Router $router)
     {
         $router->bind('company', function($company) {
-            return Company::with(['addresses','numbers','extracontactdetails'])->whereSlug($company)->firstOrFail();
+            return Company::with(['addresses','numbers','extracontactdetails', 'orders'])->whereSlug($company)->firstOrFail();
         });
     }
 
