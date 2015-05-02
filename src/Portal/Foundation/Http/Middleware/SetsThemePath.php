@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\Factory as View;
 class SetsThemePath {
 
     protected $defaultTheme = 'portal::themes.bootstrap.';
+    protected $defaultPages = 'portal::pages.';
 
     protected $view;
 
@@ -17,6 +18,7 @@ class SetsThemePath {
     public function handle($request, Closure $next)
     {
         $this->view->share('theme', $this->defaultTheme);
+        $this->view->share('pages', $this->defaultPages);
 
         return $next($request);
     }
