@@ -10,11 +10,21 @@ class ScriptResponseOrder extends Model {
 
     protected $table = "order_script_responses";
 
-    protected $fillable = [ ];
+    protected $fillable = [
+        'date_format',
+        'questions',
+        'transformer',
+        'filter',
+        'email_addresses',
+        'send_method',
+        'send_address',
+        'purchased',
+        'supplied',
+    ];
 
-    public function order()
+    public function details()
     {
-        return $this->morphTo();
+        return $this->morphOne('\Portal\Orders\Models\Order', 'details');
     }
 
 }

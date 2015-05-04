@@ -13,7 +13,11 @@ class Order extends Model {
     protected $table = "orders";
 
     protected $fillable = [
-
+        'product_id',
+        'price',
+        'status',
+        'invoice_id',
+        'completed_at',
     ];
 
 
@@ -29,7 +33,7 @@ class Order extends Model {
 
     public function details()
     {
-        return $this->morphMany();
+        return $this->morphTo();
     }
 
 }
