@@ -33,10 +33,17 @@ class SendScriptResults extends Command implements SelfHandling {
 
 
         $newResults = $scriptResults->filter(function($r) use($response) {
-            $returnResult = false;
+            $returnResult = true;
 
+            foreach (json_decode($response->filter, true) as $filterKey => $filterItems)
+            {
+                if ( !isset($r[$filterKey]) || !in_array($r[$filterKey], $filterItems) )
+                {
+                    $returnResult = false;
+                }
+            }
 
-
+            return $returnResult;
         });
 
         $requestedResults = new Collection();
@@ -55,9 +62,13 @@ class SendScriptResults extends Command implements SelfHandling {
             $requestedResults->push($singleReturnResult);
         }
 
+        $requestedResults = $requestedResults->transformWithHeadings(json_decode($response->transformer, true));
+
         $returnMethod = 'to' . ucfirst(strtolower($response->send_method));
 
         $requestedResults->$returnMethod(json_decode($response->send_address, true));
+
+
 
         dd(
             $returnMethod

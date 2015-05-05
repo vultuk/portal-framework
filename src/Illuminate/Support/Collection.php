@@ -23,6 +23,24 @@ class Collection extends BaseCollection
     }
 
 
+    public function transformWithHeadings($headings)
+    {
+        $newCollection = new Collection();
+
+        foreach ($this as $item)
+        {
+            $returnArray = [];
+
+            foreach ($headings as $key => $value)
+            {
+                 $returnArray[$value] = $item[$key];
+            }
+
+            $newCollection->push($returnArray);
+        }
+
+        return $newCollection;
+    }
 
     public function toXls($filename, $export = true, $password = null)
     {
