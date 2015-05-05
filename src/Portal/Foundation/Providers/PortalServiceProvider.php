@@ -1,6 +1,8 @@
 <?php namespace Portal\Foundation\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Portal\Companies\Models\Company;
 use Portal\Scripts\Contracts\ReportRepository;
 use Portal\Scripts\Repositories\Report\CachedReportRepository;
 use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
@@ -17,13 +19,12 @@ class PortalServiceProvider extends ServiceProvider {
 
     protected $resourcesDirectory = '/../../../../';
 
-
     /**
      * Perform post-registration booting of services.
      *
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
         // Load the config files
         $this->mergeConfigFiles();
@@ -31,12 +32,26 @@ class PortalServiceProvider extends ServiceProvider {
         // Load the required routes
         $this->loadPackageRoutes();
 
+        // Publish the migrations
+        $this->publishes([
+            $this->getDirectory($this->resourcesDirectory, 'resources/migrations') => database_path('/migrations')
+        ], 'migrations');
+
         // Load the required Views
         $this->loadViewsFrom($this->getDirectory($this->resourcesDirectory, 'resources/views'), 'portal');
 
         // Load the required language files
         $this->loadTranslationsFrom($this->getDirectory($this->resourcesDirectory, 'resources/lang'), 'portal');
 
+        $this->bindRouting($router);
+
+    }
+
+    private function bindRouting(Router $router)
+    {
+        $router->bind('company', function($company) {
+            return Company::with(['addresses','numbers','extracontactdetails', 'orders', 'activity'])->whereSlug($company)->firstOrFail();
+        });
     }
 
     /**
@@ -62,7 +77,7 @@ class PortalServiceProvider extends ServiceProvider {
 
     protected function bindSurveys()
     {
-        $this->app->bind(ReportRepository::class, function() {
+        $this->app->bind(['survey', ReportRepository::class], function() {
             $report = new OldEloquentReportRepository();
             $report = new OldTransformReportRepository($report);
 

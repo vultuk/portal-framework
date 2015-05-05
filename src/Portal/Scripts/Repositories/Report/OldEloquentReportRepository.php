@@ -26,8 +26,9 @@ class OldEloquentReportRepository implements ReportRepository {
     public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
         // Select all results from the answer log ready for transforming
-        $query = OldSurveyAnswerLog::select("*")
+        $query = OldSurveyAnswerLog::with('client', 'client.contactdetails', 'question')->select("*")
             ->whereBetween('created_at', [$dateFrom, $dateTo])
+            ->where('script_id', $scriptId)
             ->get();
 
         // Return all of the results as an Eloquent Collection
