@@ -77,7 +77,7 @@ class PortalServiceProvider extends ServiceProvider {
 
     protected function bindSurveys()
     {
-        $this->app->bind(ReportRepository::class, function() {
+        $this->app->bind(['survey', ReportRepository::class], function() {
             $report = new OldEloquentReportRepository();
             $report = new OldTransformReportRepository($report);
 
