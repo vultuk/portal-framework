@@ -10,6 +10,7 @@ use MySecurePortal\OrderScriptResponse;
 use Portal\Foundation\Commands\Command;
 use Portal\Foundation\DateTime\SetsStartAndEndDate;
 use Portal\Scripts\Models\Orders\ScriptResponseOrder;
+use Portal\Scripts\Models\Orders\ScriptResponseOrderLog;
 
 class SendScriptResults extends Command implements SelfHandling {
     use SetsStartAndEndDate;
@@ -32,47 +33,69 @@ class SendScriptResults extends Command implements SelfHandling {
             : $this->generateScriptResultCollection($response->script_id);
 
 
-        $newResults = $scriptResults->filter(function($r) use($response) {
-            $returnResult = true;
+        if (!is_null($response->filter)) {
+            $scriptResults = $scriptResults->filter(
+                function ($r) use ($response) {
+                    $returnResult = true;
 
-            foreach (json_decode($response->filter, true) as $filterKey => $filterItems)
-            {
-                if ( !isset($r[$filterKey]) || !in_array($r[$filterKey], $filterItems) )
-                {
-                    $returnResult = false;
+                    foreach (json_decode($response->filter, true) as $filterKey => $filterItems) {
+                        if (!isset($r[$filterKey]) || !in_array($r[$filterKey], $filterItems)) {
+                            $returnResult = false;
+                        }
+                    }
+
+                    return $returnResult;
                 }
-            }
-
-            return $returnResult;
-        });
-
-        $requestedResults = new Collection();
-        foreach ($newResults as $singleResult)
-        {
-            $singleReturnResult = [];
-
-            foreach (json_decode($response->questions, true) as $question)
-            {
-                if (isset($singleResult[$question])) {
-                    if ($question == 'optin.date') { $singleResult[$question] = $singleResult[$question]->format($response->date_format); }
-                    $singleReturnResult[$question] = is_array($singleResult[$question]) ? implode(', ', $singleResult[$question]) : $singleResult[$question];
-                }
-            }
-
-            $requestedResults->push($singleReturnResult);
+            );
         }
 
-        $requestedResults = $requestedResults->transformWithHeadings(json_decode($response->transformer, true));
+        if (!is_null($response->questions))
+        {
+            $requestedResults = new Collection();
+            foreach ($scriptResults as $singleResult)
+            {
+                $singleReturnResult = [];
 
-        $returnMethod = 'to' . ucfirst(strtolower($response->send_method));
+                $questions = json_decode($response->questions, true);
+                array_unshift($questions, 'client.id');
 
-        $requestedResults->$returnMethod(json_decode($response->send_address, true));
+                foreach ($questions as $question)
+                {
+                    if (isset($singleResult[$question])) {
+                        if ($question == 'optin.date') { $singleResult[$question] = $singleResult[$question]->format($response->date_format); }
+                        $singleReturnResult[$question] = is_array($singleResult[$question]) ? implode(', ', $singleResult[$question]) : $singleResult[$question];
+                    }
+                }
+
+                $requestedResults->push($singleReturnResult);
+            }
+
+            $scriptResults = $requestedResults;
+        }
+
+        $scriptResults = $scriptResults->limit($remainingLeads);
+
+        $scriptResults->each(function($r) use($response) {
+            $response->log()->save(new ScriptResponseOrderLog([
+                'client_id' => $r['client.id'],
+            ]));
+        });
+
+        if (!is_null($response->transformer))
+        {
+            $scriptResults = $scriptResults->transformWithHeadings(json_decode($response->transformer, true));
+        }
 
 
+        if ($scriptResults->count() > 0)
+        {
+            $response->supplied = $response->supplied + $scriptResults->count();
+            $response->save();
 
-        dd(
-            $returnMethod
-        );
+            $returnMethod = 'to' . ucfirst(strtolower($response->send_method));
+
+            $scriptResults->$returnMethod(json_decode($response->send_settings, true));
+        }
 
     }
 
@@ -86,7 +109,7 @@ class SendScriptResults extends Command implements SelfHandling {
         }
 
         // Return the number of leads left to supply.
-        return $response->purchased - $response->supplied;
+        return $response->purchased == 0 ? 0 : $response->purchased - $response->supplied;
     }
 
     protected function generateScriptResultCollection($scriptId)

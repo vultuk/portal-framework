@@ -1,8 +1,8 @@
 <?php namespace Portal\Scripts\Repositories\Report;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use IlluminateExtensions\Support\Collection;
 use Portal\Scripts\Contracts\ReportRepository;
 
 class OldTransformReportRepository implements ReportRepository {
@@ -56,6 +56,7 @@ class OldTransformReportRepository implements ReportRepository {
             $singleInformation = [];
             if (!isset($resultArray[$result->lead_id]))
             {
+                $singleInformation['client.id'] = $result->client->id;
                 $singleInformation['client.first_name'] = $result->client->first_name;
                 $singleInformation['client.last_name'] = $result->client->last_name;
                 $singleInformation['client.address1'] = $result->client->contactdetails[0]->address1;
