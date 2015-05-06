@@ -21,9 +21,9 @@ class OldTransformReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
-        return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo);
+        return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo, $status);
     }
 
     /**
@@ -144,9 +144,9 @@ class OldTransformReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
-        $results = $this->repository->countCompletedScriptsByDate($scriptId, $dateFrom, $dateTo);
+        $results = $this->repository->countCompletedScriptsByDate($scriptId, $dateFrom, $dateTo, $status);
 
         $returnArray = new Collection($results->toArray());
 

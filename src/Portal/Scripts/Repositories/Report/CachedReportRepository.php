@@ -24,13 +24,13 @@ class CachedReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         return $this->cache->remember(
-            "countCompletedScripts-{$scriptId}-{$dateFrom}-{$dateTo}",
+            "countCompletedScripts-{$scriptId}-{$dateFrom}-{$dateTo}-{$status}",
             $this->getCacheTime($dateFrom, $dateTo),
-            function() use ($scriptId, $dateFrom, $dateTo) {
-                return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo);
+            function() use ($scriptId, $dateFrom, $dateTo, $status) {
+                return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo, $status);
             }
         );
     }
@@ -105,13 +105,13 @@ class CachedReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         return $this->cache->remember(
-            "countCompletedScriptsByDate-{$scriptId}-{$dateFrom}-{$dateTo}",
+            "countCompletedScriptsByDate-{$scriptId}-{$dateFrom}-{$dateTo}-{$status}",
             $this->getCacheTime($dateFrom, $dateTo),
-            function() use ($scriptId, $dateFrom, $dateTo) {
-                return $this->repository->countCompletedScriptsByDate($scriptId, $dateFrom, $dateTo);
+            function() use ($scriptId, $dateFrom, $dateTo, $status) {
+                return $this->repository->countCompletedScriptsByDate($scriptId, $dateFrom, $dateTo, $status);
             }
         );
     }

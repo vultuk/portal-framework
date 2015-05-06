@@ -8,25 +8,15 @@ use Portal\Scripts\Models\OldSurveyAnswerLog;
 
 class OldEloquentReportRepository implements ReportRepository {
 
-    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
 
         $query = Log::select(DB::raw("count(DISTINCT lead_id) as total"))
             ->whereBetween('created_at', [$dateFrom, $dateTo])
             ->where('script_id', $scriptId)
-            ->where('status', 'COMPLETE')
+            ->where('status', $status)
             ->first();
 
-        return (int)$query->total;
-
-
-        // Select all the distinct Lead IDs from the answer log
-        $query = OldSurveyAnswerLog::select(DB::raw("count(DISTINCT lead_id) as total"))
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->where('script_id', $scriptId)
-            ->first();
-
-        // Return the count as an integer
         return (int)$query->total;
     }
 
@@ -78,13 +68,13 @@ class OldEloquentReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         // Select all the distinct Lead IDs from the answer log
         $query = Log::select(DB::raw("DATE(created_at) as date, count(DISTINCT lead_id) as total"))
             ->whereBetween('created_at', [$dateFrom, $dateTo])
             ->where('script_id', $scriptId)
-            ->where('status', 'COMPLETE')
+            ->where('status', $status)
             ->groupBy(DB::raw('DATE(created_at)'))
             ->get();
 
