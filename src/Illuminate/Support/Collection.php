@@ -38,6 +38,47 @@ class Collection extends BaseCollection
         return $newCollection;
     }
 
+    public function toUrl(array $settings)
+    {
+
+        $postedResults = new Collection();
+        $this->each(function($item) use($settings, &$postedResults) {
+
+            $data = http_build_query( array_merge($settings['defaults'], $item) );
+
+            if ($settings['method'] == 'POST')
+            {
+                $result = file_get_contents($settings['url'], false, stream_context_create([
+                    'http' => [
+                        'method' => 'POST',
+                        'header' => 'Content-type: application/x-www-form-urlencoded',
+                        'content' => $data,
+                    ]
+                ]));
+            }
+            else
+            {
+                $result = file_get_contents($settings['url'] . '?' . $data);
+            }
+
+            $item[strtolower($settings['method']) . '_result'] = $result;
+
+            $postedResults->push($item);
+        });
+
+        // If email settings are available pass on the completed data set
+        if (isset($settings['to']) && isset($settings['filename']) && isset($settings['subject']))
+        {
+            $postedResults->toEmail([
+                'to' => $settings['to'],
+                'subject' => $settings['subject'],
+                'filename' => $settings['filename'],
+            ]);
+        }
+
+        return $postedResults;
+    }
+
     public function toEmail(array $settings)
     {
         \Mail::send('portal::emails.foundation.collection.toemail', [
@@ -49,10 +90,12 @@ class Collection extends BaseCollection
             $xl = $this->toXls($filename, false, 'Password!');
 
             $message->to($settings['to']);
-            $message->subject($settings['subject']);
+            $message->subject($settings['subject'] . ' - ' . Carbon::now()->format('d/m/Y'));
             $message->from('noreply@mysecureportal.net', 'My Secure Portal');
             $message->attach(storage_path($this->excelStoragePath) . '/' . $filename . '.xls');
         });
+
+        return $this;
     }
 
 
@@ -66,7 +109,7 @@ class Collection extends BaseCollection
 
             foreach ($headings as $key => $value)
             {
-                 $returnArray[$value] = $item[$key];
+                 $returnArray[$value] = isset($item[$key]) ? $item[$key] : 'Unknown';
             }
 
             $newCollection->push($returnArray);

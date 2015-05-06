@@ -53,50 +53,74 @@ class OldTransformReportRepository implements ReportRepository {
 
         foreach ($scriptResults as $result)
         {
-            $singleInformation = [];
-            if (!isset($resultArray[$result->lead_id]))
-            {
-                $singleInformation['client.id'] = !is_null($result->client->id) ? $result->client->id : '' ;
-                $singleInformation['client.title'] = !is_null($result->client->title) ? $result->client->title : '';
-                $singleInformation['client.first_name'] = !is_null($result->client->first_name) ? $result->client->first_name : '' ;
-                $singleInformation['client.last_name'] = !is_null($result->client->last_name) ? $result->client->last_name : '' ;
-                $singleInformation['client.address1'] = !is_null($result->client->contactdetails[0]->address1) ? $result->client->contactdetails[0]->address1 : '' ;
-                $singleInformation['client.address2'] = !is_null($result->client->contactdetails[0]->address2) ? $result->client->contactdetails[0]->address2 : '' ;
-                $singleInformation['client.address3'] = !is_null($result->client->contactdetails[0]->address3) ? $result->client->contactdetails[0]->address3 : '' ;
-                $singleInformation['client.town'] = !is_null($result->client->contactdetails[0]->town) ? $result->client->contactdetails[0]->town : '' ;
-                $singleInformation['client.county'] = !is_null($result->client->contactdetails[0]->county) ? $result->client->contactdetails[0]->county : '' ;
-                $singleInformation['client.postal_code'] = !is_null($result->client->contactdetails[0]->postal_code) ? $result->client->contactdetails[0]->postal_code : '' ;
-                $singleInformation['client.telephone'] = !is_null($result->client->contactdetails[0]->telephone) ? $result->client->contactdetails[0]->telephone : '' ;
-                $singleInformation['client.mobile'] = !is_null($result->client->contactdetails[0]->mobile) ? $result->client->contactdetails[0]->mobile : '' ;
-                $singleInformation['client.email'] = !is_null($result->client->contactdetails[0]->email) ? $result->client->contactdetails[0]->email : '' ;
-                $singleInformation['optin.date'] = !is_null($result->created_at) ? $result->created_at : '';
-            } else {
-                $singleInformation = $resultArray[$result->lead_id];
-            }
-
-
-            if (isset($singleInformation[Str::slug($result->question->name)]))
-            {
-                $currentAnswers = $singleInformation[Str::slug($result->question->name)];
-
-                if (is_array($currentAnswers))
-                {
-                    array_push($currentAnswers, $result->question_response_value);
+            if (!is_null($result->client)) {
+                $singleInformation = [];
+                if (!isset($resultArray[$result->lead_id])) {
+                    $singleInformation['client.id']          = !is_null($result->client->id) ? $result->client->id : '';
+                    $singleInformation['client.title']       = !is_null(
+                        $result->client->title
+                    ) ? $result->client->title : '';
+                    $singleInformation['client.first_name']  = !is_null(
+                        $result->client->first_name
+                    ) ? $result->client->first_name : '';
+                    $singleInformation['client.last_name']   = !is_null(
+                        $result->client->last_name
+                    ) ? $result->client->last_name : '';
+                    $singleInformation['client.address1']    = !is_null(
+                        $result->client->contactdetails[0]->address1
+                    ) ? $result->client->contactdetails[0]->address1 : '';
+                    $singleInformation['client.address2']    = !is_null(
+                        $result->client->contactdetails[0]->address2
+                    ) ? $result->client->contactdetails[0]->address2 : '';
+                    $singleInformation['client.address3']    = !is_null(
+                        $result->client->contactdetails[0]->address3
+                    ) ? $result->client->contactdetails[0]->address3 : '';
+                    $singleInformation['client.town']        = !is_null(
+                        $result->client->contactdetails[0]->town
+                    ) ? $result->client->contactdetails[0]->town : '';
+                    $singleInformation['client.county']      = !is_null(
+                        $result->client->contactdetails[0]->county
+                    ) ? $result->client->contactdetails[0]->county : '';
+                    $singleInformation['client.postal_code'] = !is_null(
+                        $result->client->contactdetails[0]->postal_code
+                    ) ? $result->client->contactdetails[0]->postal_code : '';
+                    $singleInformation['client.telephone']   = !is_null(
+                        $result->client->contactdetails[0]->telephone
+                    ) ? '0' . $result->client->contactdetails[0]->telephone : '';
+                    $singleInformation['client.mobile']      = !is_null(
+                        $result->client->contactdetails[0]->mobile
+                    ) ? '0' . $result->client->contactdetails[0]->mobile : '';
+                    $singleInformation['client.email']       = !is_null(
+                        $result->client->contactdetails[0]->email
+                    ) ? $result->client->contactdetails[0]->email : '';
+                    $singleInformation['optin.date']         = !is_null($result->created_at) ? $result->created_at : '';
                 } else {
-                    $currentAnswers = [
-                        $currentAnswers,
-                        $result->question_response_value,
-                    ];
+                    $singleInformation = $resultArray[$result->lead_id];
                 }
-            } else {
-                $currentAnswers = $result->question_response_value;
+
+
+                if (isset($singleInformation[Str::slug($result->question->name)])) {
+                    $currentAnswers = $singleInformation[Str::slug($result->question->name)];
+
+                    if (is_array($currentAnswers)) {
+                        array_push($currentAnswers, $result->question_response_value);
+                    } else {
+                        $currentAnswers = [
+                            $currentAnswers,
+                            $result->question_response_value,
+                        ];
+                    }
+                } else {
+                    $currentAnswers = $result->question_response_value;
+                }
+
+
+                $singleInformation[Str::slug($result->question->name)] = $currentAnswers;
+
+                $resultArray[$result->lead_id] = $singleInformation;
             }
-
-
-            $singleInformation[Str::slug($result->question->name)] = $currentAnswers;
-
-            $resultArray[$result->lead_id] = $singleInformation;
         }
+
 
         $returnCollection = new Collection($resultArray);
 
