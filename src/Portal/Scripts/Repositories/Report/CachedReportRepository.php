@@ -97,4 +97,22 @@ class CachedReportRepository implements ReportRepository {
             }
         );
     }
+
+    /**
+     * @param null           $scriptId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    {
+        return $this->cache->remember(
+            "countCompletedScriptsByDate-{$scriptId}-{$dateFrom}-{$dateTo}",
+            $this->getCacheTime($dateFrom, $dateTo),
+            function() use ($scriptId, $dateFrom, $dateTo) {
+                return $this->repository->countCompletedScriptsByDate($scriptId, $dateFrom, $dateTo);
+            }
+        );
+    }
 }
