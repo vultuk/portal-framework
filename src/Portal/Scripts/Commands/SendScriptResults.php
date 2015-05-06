@@ -49,6 +49,13 @@ class SendScriptResults extends Command implements SelfHandling {
             );
         }
 
+        $sr = new Collection();
+        $scriptResults = $scriptResults->each(function($r) use($response, &$sr) {
+            $r['optin.date'] = $r['optin.date']->format($response->date_format);
+            $sr->push($r);
+        });
+        $scriptResults = $sr;
+
         if (!is_null($response->questions))
         {
             $requestedResults = new Collection();
@@ -62,7 +69,6 @@ class SendScriptResults extends Command implements SelfHandling {
                 foreach ($questions as $question)
                 {
                     if (isset($singleResult[$question])) {
-                        if ($question == 'optin.date') { $singleResult[$question] = $singleResult[$question]->format($response->date_format); }
                         $singleReturnResult[$question] = is_array($singleResult[$question]) ? implode(', ', $singleResult[$question]) : $singleResult[$question];
                     }
                 }

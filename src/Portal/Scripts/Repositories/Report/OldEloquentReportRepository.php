@@ -25,7 +25,7 @@ class OldEloquentReportRepository implements ReportRepository {
         // TODO: Implement countCompletedQuestions() method.
     }
 
-    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         // Select all results from the answer log ready for transforming
         $query = OldSurveyAnswerLog::with('client', 'client.contactdetails', 'question')->select("*")

@@ -39,7 +39,7 @@ interface ReportRepository
      *
      * @return mixed
      */
-    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null);
+    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE');
 
     /**
      * @param array          $questionAndAnswers
