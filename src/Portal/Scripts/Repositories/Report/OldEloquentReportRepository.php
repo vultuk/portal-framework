@@ -51,7 +51,7 @@ class OldEloquentReportRepository implements ReportRepository {
      */
     public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
-        $query = Log::with('agent')->select('agent_id', 'status');
+        $query = Log::with('agent')->select('status', 'agent_id');
 
         if (!is_null($agentId))
         {

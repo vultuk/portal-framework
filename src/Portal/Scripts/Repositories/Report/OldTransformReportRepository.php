@@ -157,8 +157,12 @@ class OldTransformReportRepository implements ReportRepository {
         $returnResult = [];
         foreach ($results as $r)
         {
-            $returnResult[$r['agent']['full_name']][$r['status']] = (!isset($returnResults[$r['agent']['full_name']][$r['status']])) ? 1 : $returnResults[$r['agent']['full_name']][$r['status']] + 1;
+            $returnResult[$r['agent']['full_name']][$r['status']]
+                = (!isset($returnResult[$r['agent']['full_name']][$r['status']]))
+                ? 1
+                : $returnResult[$r['agent']['full_name']][$r['status']] + 1;
         }
+
 
         $returnResults = new Collection();
         foreach ($returnResult as $agentName => $r)
@@ -170,12 +174,9 @@ class OldTransformReportRepository implements ReportRepository {
             ]);
         }
 
-        dd([
-            $dateFrom,
-            $dateTo
-        ]);
-
-        return $returnResults;
+        return $returnResults->sortByDesc(function($r) {
+            return $r['Completed Surveys'];
+        });
     }
 
     /**
