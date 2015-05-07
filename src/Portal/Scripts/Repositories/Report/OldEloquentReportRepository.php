@@ -51,14 +51,17 @@ class OldEloquentReportRepository implements ReportRepository {
      */
     public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
-        $query = OldSurveyAnswerLog::select(DB::raw("DATE(created_at) as 'Date', count(DISTINCT lead_id) as 'Total'"))
-            ->where('agent_id', $agentId)
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->groupBy(DB::raw("DATE(created_at)"))
-            ->orderBy('Date')
+        $query = Log::with('agent')->select('agent_id', 'status');
+
+        if (!is_null($agentId))
+        {
+            $query = $query->where('agent_id', $agentId);
+        }
+
+        $query = $query->whereBetween('completed_at', [$dateFrom, $dateTo])
             ->get();
 
-        return $query;
+        return $query->toArray();
     }
 
     /**

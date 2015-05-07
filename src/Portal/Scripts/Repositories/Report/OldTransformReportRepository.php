@@ -153,13 +153,29 @@ class OldTransformReportRepository implements ReportRepository {
     {
         $results = $this->repository->getSurveyCountByAgentId($agentId, $dateFrom, $dateTo);
 
-        $returnArray = [];
 
-        array_map(function($c) use(&$returnArray) {
-            $returnArray[$c['Date']] = $c['Total'];
-        }, is_null($results) ? [] : $results->toArray());
+        $returnResult = [];
+        foreach ($results as $r)
+        {
+            $returnResult[$r['agent']['full_name']][$r['status']] = (!isset($returnResults[$r['agent']['full_name']][$r['status']])) ? 1 : $returnResults[$r['agent']['full_name']][$r['status']] + 1;
+        }
 
-        return $returnArray;
+        $returnResults = new Collection();
+        foreach ($returnResult as $agentName => $r)
+        {
+            $returnResults->push([
+                'Agent Name' => $agentName,
+                'Completed Surveys' => isset($r['COMPLETE']) ? $r['COMPLETE'] : 0,
+                'Partial Surveys' => isset($r['PARTIAL']) ? $r['PARTIAL'] : 0,
+            ]);
+        }
+
+        dd([
+            $dateFrom,
+            $dateTo
+        ]);
+
+        return $returnResults;
     }
 
     /**
