@@ -24,13 +24,21 @@ class SendScriptResults extends Command implements SelfHandling {
 
     protected function sendScriptResults(ScriptResponseOrder $response)
     {
+
         // Check the remaining leads
         $remainingLeads = $this->checkRemainingSupply($response);
+
+        if ($remainingLeads == -1)
+        {
+            return false;
+        }
 
         // Get results for this order ready to process
         $scriptResults = isset($this->scriptResults[$response->script_id])
             ? $this->scriptResults[$response->script_id]
             : $this->generateScriptResultCollection($response->script_id);
+
+
 
 
         if (!is_null($response->filter)) {
@@ -39,15 +47,32 @@ class SendScriptResults extends Command implements SelfHandling {
                     $returnResult = true;
 
                     foreach (json_decode($response->filter, true) as $filterKey => $filterItems) {
-                        if (!isset($r[$filterKey]) || !in_array($r[$filterKey], $filterItems)) {
-                            $returnResult = false;
+                        if (is_array($filterItems))
+                        {
+                            if (!isset($r[$filterKey]) || !in_array($r[$filterKey], $filterItems)) {
+                                $returnResult = false;
+                            }
+                        } else {
+                            if (!isset($r[$filterKey]) || is_array($r[$filterKey]) || is_null($r[$filterKey]) || $r[$filterKey] == '00' || strlen($r[$filterKey]) < 2 || $r[$filterKey] === false )
+                            {
+                                $returnResult = false;
+                            }
                         }
+
                     }
 
                     return $returnResult;
                 }
             );
         }
+
+
+        $sr = new Collection();
+        $scriptResults = $scriptResults->each(function($r) use($response, &$sr) {
+            $r['optin.date'] = $r['optin.date']->format($response->date_format);
+            $sr->push($r);
+        });
+        $scriptResults = $sr;
 
         if (!is_null($response->questions))
         {
@@ -62,7 +87,6 @@ class SendScriptResults extends Command implements SelfHandling {
                 foreach ($questions as $question)
                 {
                     if (isset($singleResult[$question])) {
-                        if ($question == 'optin.date') { $singleResult[$question] = $singleResult[$question]->format($response->date_format); }
                         $singleReturnResult[$question] = is_array($singleResult[$question]) ? implode(', ', $singleResult[$question]) : $singleResult[$question];
                     }
                 }
@@ -72,6 +96,8 @@ class SendScriptResults extends Command implements SelfHandling {
 
             $scriptResults = $requestedResults;
         }
+
+
 
         $scriptResults = $scriptResults->limit($remainingLeads);
 
@@ -86,15 +112,14 @@ class SendScriptResults extends Command implements SelfHandling {
             $scriptResults = $scriptResults->transformWithHeadings(json_decode($response->transformer, true));
         }
 
-
         if ($scriptResults->count() > 0)
         {
-            $response->supplied = $response->supplied + $scriptResults->count();
-            $response->save();
-
             $returnMethod = 'to' . ucfirst(strtolower($response->send_method));
 
-            $scriptResults->$returnMethod(json_decode($response->send_settings, true));
+            $scriptResults = $scriptResults->$returnMethod(json_decode($response->send_settings, true));
+
+            $response->supplied = $response->supplied + $scriptResults->count();
+            $response->save();
         }
 
     }
@@ -105,7 +130,7 @@ class SendScriptResults extends Command implements SelfHandling {
         // if not, make sure the supply hasn't reached its limit.
         if ($response->purchased > 0 && $response->supplied >= $response->purchased)
         {
-            throw new Exception('No leads left to be sent - Please create a new order');
+            return -1;
         }
 
         // Return the number of leads left to supply.

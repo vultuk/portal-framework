@@ -25,7 +25,7 @@ class OldEloquentReportRepository implements ReportRepository {
         // TODO: Implement countCompletedQuestions() method.
     }
 
-    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         // Select all results from the answer log ready for transforming
         $query = OldSurveyAnswerLog::with('client', 'client.contactdetails', 'question')->select("*")
@@ -51,14 +51,17 @@ class OldEloquentReportRepository implements ReportRepository {
      */
     public function getSurveyCountByAgentId($agentId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
-        $query = OldSurveyAnswerLog::select(DB::raw("DATE(created_at) as 'Date', count(DISTINCT lead_id) as 'Total'"))
-            ->where('agent_id', $agentId)
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->groupBy(DB::raw("DATE(created_at)"))
-            ->orderBy('Date')
+        $query = Log::with('agent')->select('status', 'agent_id');
+
+        if (!is_null($agentId))
+        {
+            $query = $query->where('agent_id', $agentId);
+        }
+
+        $query = $query->whereBetween('completed_at', [$dateFrom, $dateTo])
             ->get();
 
-        return $query;
+        return $query->toArray();
     }
 
     /**

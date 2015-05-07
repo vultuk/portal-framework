@@ -54,13 +54,13 @@ class CachedReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         return $this->cache->remember(
-            "getAllScriptResults-{$scriptId}-{$dateFrom}-{$dateTo}",
+            "getAllScriptResults-{$scriptId}-{$dateFrom}-{$dateTo}-{$status}",
             $this->getCacheTime($dateFrom, $dateTo),
-            function() use ($scriptId, $dateFrom, $dateTo) {
-                return $this->repository->getAllScriptResults($scriptId, $dateFrom, $dateTo);
+            function() use ($scriptId, $dateFrom, $dateTo, $status) {
+                return $this->repository->getAllScriptResults($scriptId, $dateFrom, $dateTo, $status);
             }
         );
     }
