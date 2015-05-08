@@ -53,7 +53,7 @@ class SendScriptResults extends Command implements SelfHandling {
                                 $returnResult = false;
                             }
                         } else {
-                            if (!isset($r[$filterKey]) || is_array($r[$filterKey]) || is_null($r[$filterKey]) || $r[$filterKey] == '00' || strlen($r[$filterKey]) < 2 || $r[$filterKey] === false )
+                            if (!isset($r[$filterKey]) || is_array($r[$filterKey]) || is_null($r[$filterKey]) || $r[$filterKey] == 'Not Answered' || $r[$filterKey] == '00' || $r[$filterKey] == '0' || strlen($r[$filterKey]) < 2 || $r[$filterKey] === false )
                             {
                                 $returnResult = false;
                             }
@@ -74,28 +74,46 @@ class SendScriptResults extends Command implements SelfHandling {
         });
         $scriptResults = $sr;
 
-        if (!is_null($response->questions))
+
+        $questions = [];
+        if (is_null($response->questions))
         {
-            $requestedResults = new Collection();
-            foreach ($scriptResults as $singleResult)
-            {
-                $singleReturnResult = [];
-
-                $questions = json_decode($response->questions, true);
-                array_unshift($questions, 'client.id');
-
-                foreach ($questions as $question)
+            $scriptResults->each(function($s) use(&$questions) {
+                foreach ($s as $k => $v)
                 {
-                    if (isset($singleResult[$question])) {
-                        $singleReturnResult[$question] = is_array($singleResult[$question]) ? implode(', ', $singleResult[$question]) : $singleResult[$question];
+                    if (!in_array($k, $questions))
+                    {
+                        $questions[] = $k;
                     }
                 }
+            });
+        } else {
+            $questions = json_decode($response->questions, true);
+        }
 
-                $requestedResults->push($singleReturnResult);
+        $requestedResults = new Collection();
+        foreach ($scriptResults as $singleResult)
+        {
+            $singleReturnResult = [];
+            array_unshift($questions, 'client.id');
+
+            foreach ($questions as $question)
+            {
+                if (isset($singleResult[$question])) {
+                    $singleReturnResult[$question]
+                        = is_array($singleResult[$question])
+                        ? implode(', ', $singleResult[$question])
+                        : $singleResult[$question];
+                } else {
+                    $singleResult[$question] = 0;
+                }
             }
 
-            $scriptResults = $requestedResults;
+            $requestedResults->push($singleReturnResult);
         }
+
+        $scriptResults = $requestedResults;
+
 
 
 
