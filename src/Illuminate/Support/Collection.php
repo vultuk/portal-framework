@@ -109,7 +109,7 @@ class Collection extends BaseCollection
 
             foreach ($headings as $key => $value)
             {
-                 $returnArray[$value] = isset($item[$key]) ? $item[$key] : 'Unknown';
+                 $returnArray[$value] = isset($item[$key]) ? $item[$key] : false;
             }
 
             $newCollection->push($returnArray);

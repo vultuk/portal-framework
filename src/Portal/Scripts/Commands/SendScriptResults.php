@@ -125,10 +125,19 @@ class SendScriptResults extends Command implements SelfHandling {
             ]));
         });
 
+
+        $transformer = [];
         if (!is_null($response->transformer))
         {
-            $scriptResults = $scriptResults->transformWithHeadings(json_decode($response->transformer, true));
+            $transformer = json_decode($response->transformer, true);
+        } else {
+            foreach ($questions as $question)
+            {
+                $transformer[$question] = $question;
+            }
         }
+
+        $scriptResults = $scriptResults->transformWithHeadings($transformer);
 
         if ($scriptResults->count() > 0)
         {
