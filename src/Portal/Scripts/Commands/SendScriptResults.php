@@ -4,6 +4,7 @@ use Aws\CloudFront\Exception\Exception;
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use IlluminateExtensions\Support\Collection;
 use MySecurePortal\OrderScriptResponse;
@@ -12,8 +13,8 @@ use Portal\Foundation\DateTime\SetsStartAndEndDate;
 use Portal\Scripts\Models\Orders\ScriptResponseOrder;
 use Portal\Scripts\Models\Orders\ScriptResponseOrderLog;
 
-class SendScriptResults extends Command implements SelfHandling {
-    use SetsStartAndEndDate;
+class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued {
+    use SetsStartAndEndDate, SerializesModels;
 
     protected $orderScriptResponseId = null;
 
