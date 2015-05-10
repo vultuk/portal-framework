@@ -87,7 +87,7 @@ class Collection extends BaseCollection
         ], function($message) use($settings)
         {
             $filename = $settings['filename'] . '_' . Carbon::now()->format('YmdHis');
-            $xl = $this->toXls($filename, false, 'Password!');
+            $xl = $this->toXls($filename, false);
 
             $message->to($settings['to']);
             $message->subject($settings['subject'] . ' - ' . Carbon::now()->format('d/m/Y'));
