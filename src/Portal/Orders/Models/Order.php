@@ -17,6 +17,9 @@ class Order extends Model {
         'price',
         'status',
         'invoice_id',
+        'paid_at',
+        'estimated_completion_time',
+        'completion_percentage',
         'completed_at',
     ];
 
@@ -34,6 +37,15 @@ class Order extends Model {
     public function details()
     {
         return $this->morphTo();
+    }
+
+    public function getDates()
+    {
+        return [
+            'completed_at',
+            'created_at',
+            'updated_at',
+        ];
     }
 
 }

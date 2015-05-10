@@ -4,5 +4,6 @@ return [
     'load' => [
         'users',
         'companies',
+        'orders',
     ],
 ];

@@ -4,6 +4,7 @@ use Aws\CloudFront\Exception\Exception;
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Foundation\Bus\DispatchesCommands;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use IlluminateExtensions\Support\Collection;
@@ -14,7 +15,7 @@ use Portal\Scripts\Models\Orders\ScriptResponseOrder;
 use Portal\Scripts\Models\Orders\ScriptResponseOrderLog;
 
 class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued {
-    use SetsStartAndEndDate, SerializesModels;
+    use SetsStartAndEndDate, SerializesModels, DispatchesCommands;
 
     protected $orderScriptResponseId = null;
 
@@ -185,9 +186,17 @@ class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued 
             foreach ($allScriptOrders as $order)
             {
                 $this->sendScriptResults($order);
+
+                $this->dispatch(
+                    new CorrectScriptProgress($order)
+                );
             }
         } else {
             $this->sendScriptResults($this->orderScriptResponseId);
+
+            $this->dispatch(
+                new CorrectScriptProgress($this->orderScriptResponseId)
+            );
         }
     }
 

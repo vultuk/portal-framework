@@ -7,6 +7,7 @@ class SetsThemePath {
 
     protected $defaultTheme = 'portal::themes.bootstrap.';
     protected $defaultPages = 'portal::pages.';
+    protected $defaultLangs = 'portal::';
 
     protected $view;
 
@@ -19,6 +20,7 @@ class SetsThemePath {
     {
         $this->view->share('theme', $this->defaultTheme);
         $this->view->share('pages', $this->defaultPages);
+        $this->view->share('lang', $this->defaultLangs);
 
         return $next($request);
     }
