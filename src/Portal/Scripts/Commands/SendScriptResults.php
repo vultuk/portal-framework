@@ -4,6 +4,8 @@ use Aws\CloudFront\Exception\Exception;
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Foundation\Bus\DispatchesCommands;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use IlluminateExtensions\Support\Collection;
 use MySecurePortal\OrderScriptResponse;
@@ -12,8 +14,8 @@ use Portal\Foundation\DateTime\SetsStartAndEndDate;
 use Portal\Scripts\Models\Orders\ScriptResponseOrder;
 use Portal\Scripts\Models\Orders\ScriptResponseOrderLog;
 
-class SendScriptResults extends Command implements SelfHandling {
-    use SetsStartAndEndDate;
+class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued {
+    use SetsStartAndEndDate, SerializesModels, DispatchesCommands;
 
     protected $orderScriptResponseId = null;
 
@@ -125,10 +127,19 @@ class SendScriptResults extends Command implements SelfHandling {
             ]));
         });
 
+
+        $transformer = [];
         if (!is_null($response->transformer))
         {
-            $scriptResults = $scriptResults->transformWithHeadings(json_decode($response->transformer, true));
+            $transformer = json_decode($response->transformer, true);
+        } else {
+            foreach ($questions as $question)
+            {
+                $transformer[$question] = $question;
+            }
         }
+
+        $scriptResults = $scriptResults->transformWithHeadings($transformer);
 
         if ($scriptResults->count() > 0)
         {
@@ -175,9 +186,17 @@ class SendScriptResults extends Command implements SelfHandling {
             foreach ($allScriptOrders as $order)
             {
                 $this->sendScriptResults($order);
+
+                $this->dispatch(
+                    new CorrectScriptProgress($order)
+                );
             }
         } else {
             $this->sendScriptResults($this->orderScriptResponseId);
+
+            $this->dispatch(
+                new CorrectScriptProgress($this->orderScriptResponseId)
+            );
         }
     }
 
