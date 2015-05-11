@@ -30,7 +30,7 @@ class CorrectScriptProgress extends Command implements SelfHandling, ShouldBeQue
 
             $this->orderScriptResponse->details->save();
 
-            if (ceil($remainingDays) <= 2 && !is_null($this->orderScriptResponse->details->completed_at))
+            if (ceil($remainingDays) <= 2 && is_null($this->orderScriptResponse->details->completed_at))
             {
                 $companyName = $this->orderScriptResponse->details->link->name;
                 $companySlug = $this->orderScriptResponse->details->link->slug;
