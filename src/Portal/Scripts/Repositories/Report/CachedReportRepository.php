@@ -24,13 +24,13 @@ class CachedReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         return $this->cache->remember(
-            "countCompletedScripts-{$scriptId}-{$dateFrom}-{$dateTo}",
+            "countCompletedScripts-{$scriptId}-{$dateFrom}-{$dateTo}-{$status}",
             $this->getCacheTime($dateFrom, $dateTo),
-            function() use ($scriptId, $dateFrom, $dateTo) {
-                return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo);
+            function() use ($scriptId, $dateFrom, $dateTo, $status) {
+                return $this->repository->countCompletedScripts($scriptId, $dateFrom, $dateTo, $status);
             }
         );
     }
@@ -54,13 +54,13 @@ class CachedReportRepository implements ReportRepository {
      *
      * @return mixed
      */
-    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null)
+    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
     {
         return $this->cache->remember(
-            "getAllScriptResults-{$scriptId}-{$dateFrom}-{$dateTo}",
+            "getAllScriptResults-{$scriptId}-{$dateFrom}-{$dateTo}-{$status}",
             $this->getCacheTime($dateFrom, $dateTo),
-            function() use ($scriptId, $dateFrom, $dateTo) {
-                return $this->repository->getAllScriptResults($scriptId, $dateFrom, $dateTo);
+            function() use ($scriptId, $dateFrom, $dateTo, $status) {
+                return $this->repository->getAllScriptResults($scriptId, $dateFrom, $dateTo, $status);
             }
         );
     }
@@ -94,6 +94,24 @@ class CachedReportRepository implements ReportRepository {
             $this->getCacheTime($dateFrom, $dateTo),
             function() use ($agentId, $dateFrom, $dateTo) {
                 return $this->repository->getSurveyCountByAgentId($agentId, $dateFrom, $dateTo);
+            }
+        );
+    }
+
+    /**
+     * @param null           $scriptId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE')
+    {
+        return $this->cache->remember(
+            "countCompletedScriptsByDate-{$scriptId}-{$dateFrom}-{$dateTo}-{$status}",
+            $this->getCacheTime($dateFrom, $dateTo),
+            function() use ($scriptId, $dateFrom, $dateTo, $status) {
+                return $this->repository->countCompletedScriptsByDate($scriptId, $dateFrom, $dateTo, $status);
             }
         );
     }

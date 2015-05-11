@@ -50,7 +50,7 @@ class PortalServiceProvider extends ServiceProvider {
     private function bindRouting(Router $router)
     {
         $router->bind('company', function($company) {
-            return Company::with(['addresses','numbers','extracontactdetails', 'orders', 'activity'])->whereSlug($company)->firstOrFail();
+            return Company::with(['addresses','numbers','extracontactdetails', 'orders', 'orders.details', 'activity'])->whereSlug($company)->firstOrFail();
         });
     }
 
@@ -81,7 +81,7 @@ class PortalServiceProvider extends ServiceProvider {
             $report = new OldEloquentReportRepository();
             $report = new OldTransformReportRepository($report);
 
-            $report = new CachedReportRepository($report, $this->app['cache.store']);
+            //$report = new CachedReportRepository($report, $this->app['cache.store']);
 
             return $report;
         });

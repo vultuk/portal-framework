@@ -12,7 +12,16 @@ interface ReportRepository
      *
      * @return mixed
      */
-    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null);
+    public function countCompletedScripts($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE');
+
+    /**
+     * @param null           $scriptId
+     * @param \Carbon\Carbon $dateFrom
+     * @param \Carbon\Carbon $dateTo
+     *
+     * @return mixed
+     */
+    public function countCompletedScriptsByDate($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE');
 
     /**
      * @param null           $questionId
@@ -30,7 +39,7 @@ interface ReportRepository
      *
      * @return mixed
      */
-    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null);
+    public function getAllScriptResults($scriptId = null, Carbon $dateFrom = null, Carbon $dateTo = null, $status = 'COMPLETE');
 
     /**
      * @param array          $questionAndAnswers

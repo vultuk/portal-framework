@@ -4,15 +4,18 @@ use Aws\CloudFront\Exception\Exception;
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Foundation\Bus\DispatchesCommands;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use IlluminateExtensions\Support\Collection;
 use MySecurePortal\OrderScriptResponse;
 use Portal\Foundation\Commands\Command;
 use Portal\Foundation\DateTime\SetsStartAndEndDate;
 use Portal\Scripts\Models\Orders\ScriptResponseOrder;
+use Portal\Scripts\Models\Orders\ScriptResponseOrderLog;
 
-class SendScriptResults extends Command implements SelfHandling {
-    use SetsStartAndEndDate;
+class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued {
+    use SetsStartAndEndDate, SerializesModels, DispatchesCommands;
 
     protected $orderScriptResponseId = null;
 
@@ -23,8 +26,14 @@ class SendScriptResults extends Command implements SelfHandling {
 
     protected function sendScriptResults(ScriptResponseOrder $response)
     {
+
         // Check the remaining leads
         $remainingLeads = $this->checkRemainingSupply($response);
+
+        if ($remainingLeads == -1)
+        {
+            return false;
+        }
 
         // Get results for this order ready to process
         $scriptResults = isset($this->scriptResults[$response->script_id])
@@ -32,36 +41,115 @@ class SendScriptResults extends Command implements SelfHandling {
             : $this->generateScriptResultCollection($response->script_id);
 
 
-        $newResults = $scriptResults->filter(function($r) use($response) {
-            $returnResult = false;
 
 
+        if (!is_null($response->filter)) {
+            $scriptResults = $scriptResults->filter(
+                function ($r) use ($response) {
+                    $returnResult = true;
 
+                    foreach (json_decode($response->filter, true) as $filterKey => $filterItems) {
+                        if (is_array($filterItems))
+                        {
+                            if (!isset($r[$filterKey]) || !in_array($r[$filterKey], $filterItems)) {
+                                $returnResult = false;
+                            }
+                        } else {
+                            if (!isset($r[$filterKey]) || is_array($r[$filterKey]) || is_null($r[$filterKey]) || $r[$filterKey] == 'Not Answered' || $r[$filterKey] == '00' || $r[$filterKey] == '0' || strlen($r[$filterKey]) < 2 || $r[$filterKey] === false )
+                            {
+                                $returnResult = false;
+                            }
+                        }
+
+                    }
+
+                    return $returnResult;
+                }
+            );
+        }
+
+
+        $sr = new Collection();
+        $scriptResults = $scriptResults->each(function($r) use($response, &$sr) {
+            $r['optin.date'] = $r['optin.date']->format($response->date_format);
+            $sr->push($r);
         });
+        $scriptResults = $sr;
+
+
+        $questions = [];
+        if (is_null($response->questions))
+        {
+            $scriptResults->each(function($s) use(&$questions) {
+                foreach ($s as $k => $v)
+                {
+                    if (!in_array($k, $questions))
+                    {
+                        $questions[] = $k;
+                    }
+                }
+            });
+        } else {
+            $questions = json_decode($response->questions, true);
+        }
 
         $requestedResults = new Collection();
-        foreach ($newResults as $singleResult)
+        foreach ($scriptResults as $singleResult)
         {
             $singleReturnResult = [];
+            array_unshift($questions, 'client.id');
 
-            foreach (json_decode($response->questions, true) as $question)
+            foreach ($questions as $question)
             {
                 if (isset($singleResult[$question])) {
-                    if ($question == 'optin.date') { $singleResult[$question] = $singleResult[$question]->format($response->date_format); }
-                    $singleReturnResult[$question] = is_array($singleResult[$question]) ? implode(', ', $singleResult[$question]) : $singleResult[$question];
+                    $singleReturnResult[$question]
+                        = is_array($singleResult[$question])
+                        ? implode(', ', $singleResult[$question])
+                        : $singleResult[$question];
+                } else {
+                    $singleResult[$question] = 0;
                 }
             }
 
             $requestedResults->push($singleReturnResult);
         }
 
-        $returnMethod = 'to' . ucfirst(strtolower($response->send_method));
+        $scriptResults = $requestedResults;
 
-        $requestedResults->$returnMethod(json_decode($response->send_address, true));
 
-        dd(
-            $returnMethod
-        );
+
+
+        $scriptResults = $scriptResults->limit($remainingLeads);
+
+        $scriptResults->each(function($r) use($response) {
+            $response->log()->save(new ScriptResponseOrderLog([
+                'client_id' => $r['client.id'],
+            ]));
+        });
+
+
+        $transformer = [];
+        if (!is_null($response->transformer))
+        {
+            $transformer = json_decode($response->transformer, true);
+        } else {
+            foreach ($questions as $question)
+            {
+                $transformer[$question] = $question;
+            }
+        }
+
+        $scriptResults = $scriptResults->transformWithHeadings($transformer);
+
+        if ($scriptResults->count() > 0)
+        {
+            $returnMethod = 'to' . ucfirst(strtolower($response->send_method));
+
+            $scriptResults = $scriptResults->$returnMethod(json_decode($response->send_settings, true));
+
+            $response->supplied = $response->supplied + $scriptResults->count();
+            $response->save();
+        }
 
     }
 
@@ -71,11 +159,11 @@ class SendScriptResults extends Command implements SelfHandling {
         // if not, make sure the supply hasn't reached its limit.
         if ($response->purchased > 0 && $response->supplied >= $response->purchased)
         {
-            throw new Exception('No leads left to be sent - Please create a new order');
+            return -1;
         }
 
         // Return the number of leads left to supply.
-        return $response->purchased - $response->supplied;
+        return $response->purchased == 0 ? 0 : $response->purchased - $response->supplied;
     }
 
     protected function generateScriptResultCollection($scriptId)
@@ -98,9 +186,17 @@ class SendScriptResults extends Command implements SelfHandling {
             foreach ($allScriptOrders as $order)
             {
                 $this->sendScriptResults($order);
+
+                $this->dispatch(
+                    new CorrectScriptProgress($order)
+                );
             }
         } else {
             $this->sendScriptResults($this->orderScriptResponseId);
+
+            $this->dispatch(
+                new CorrectScriptProgress($this->orderScriptResponseId)
+            );
         }
     }
 

@@ -11,13 +11,13 @@ class ScriptResponseOrder extends Model {
     protected $table = "order_script_responses";
 
     protected $fillable = [
+        'script_id',
         'date_format',
         'questions',
         'transformer',
         'filter',
-        'email_addresses',
         'send_method',
-        'send_address',
+        'send_settings',
         'purchased',
         'supplied',
     ];
@@ -25,6 +25,11 @@ class ScriptResponseOrder extends Model {
     public function details()
     {
         return $this->morphOne('\Portal\Orders\Models\Order', 'details');
+    }
+
+    public function log()
+    {
+        return $this->hasMany('\Portal\Scripts\Models\Orders\ScriptResponseOrderLog', 'order_script_response_id');
     }
 
 }
