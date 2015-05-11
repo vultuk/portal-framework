@@ -30,7 +30,7 @@ class CorrectScriptProgress extends Command implements SelfHandling, ShouldBeQue
 
             $this->orderScriptResponse->details->save();
 
-            if (ceil($remainingDays) <= 2)
+            if (ceil($remainingDays) <= 2 && !is_null($this->orderScriptResponse->details->completed_at))
             {
                 $companyName = $this->orderScriptResponse->details->link->name;
                 $companySlug = $this->orderScriptResponse->details->link->slug;
@@ -45,8 +45,8 @@ class CorrectScriptProgress extends Command implements SelfHandling, ShouldBeQue
                     ->attach([
                         'title' => $companyName,
                         'title_link' => 'https://choiceclaims.mysecureportal.net/company/order/view/' . $companySlug,
-                        'fallback' => $companyName . " has almost reached the total amount of leads they purchased.\nThey only have an estimated " . $remaining . ' day'. ($remaining > 1 ? 's' : '') .' remaining.\nThey receive ' . $average . ' leads per day and require ' . $remainingLeads. ' more to complete their quota.',
-                        'text' => $companyName . " has almost reached the total amount of leads they purchased.\nThey only have an estimated " . $remaining . ' day'. ($remaining > 1 ? 's' : '') .' remaining.\nThey receive ' . $average . ' leads per day and require ' . $remainingLeads. ' more to complete their quota.',
+                        'fallback' => $companyName . " has almost reached the total amount of leads they purchased.\nThey only have an estimated " . $remaining . ' day'. ($remaining > 1 ? 's' : '') ." remaining.\nThey receive " . $average . ' leads per day and require ' . $remainingLeads. ' more to complete their quota.',
+                        'text' => $companyName . " has almost reached the total amount of leads they purchased.\nThey only have an estimated " . $remaining . ' day'. ($remaining > 1 ? 's' : '') ." remaining.\nThey receive " . $average . ' leads per day and require ' . $remainingLeads. ' more to complete their quota.',
                         'color' => 'danger',
 
                     ])
