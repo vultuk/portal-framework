@@ -37,6 +37,8 @@ class HipChat implements Notification {
     {
         Queue::push(function($job) use($roomName, $from, $message, $notify, $color) {
             $this->notifyChat->message_room($roomName, $from, $message, $notify, $color);
+
+            $job->delete();
         });
     }
 
