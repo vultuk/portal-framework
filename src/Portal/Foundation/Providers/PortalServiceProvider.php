@@ -2,11 +2,14 @@
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Maknz\Slack\Facades\Slack;
 use Portal\Companies\Models\Company;
+use Portal\Notifications\Contracts\Notification;
 use Portal\Scripts\Contracts\ReportRepository;
 use Portal\Scripts\Repositories\Report\CachedReportRepository;
 use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
 use Portal\Scripts\Repositories\Report\OldTransformReportRepository;
+use Portal\Slack\Classes\SlackNotification;
 use Portal\Users\Contracts\UserRepository;
 use Portal\Users\Repositories\User\OldEloquentUserRepository;
 use Portal\Users\Repositories\User\OldTransformUserRepository;
@@ -64,6 +67,7 @@ class PortalServiceProvider extends ServiceProvider {
         $this->bindUsers();
         $this->bindSurveys();
     }
+
 
     protected function bindUsers()
     {
