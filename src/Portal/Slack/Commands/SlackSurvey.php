@@ -25,6 +25,19 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
     protected $text;
 
 
+    public function callDebug()
+    {
+        return implode(', ', [
+            $this->token,
+            $this->channelName,
+            $this->username,
+            $this->command,
+            $this->action,
+            $this->text,
+        ]);
+    }
+
+
     public function callDisplay()
     {
         $this->sendSurveyResults('@' . $this->username);
