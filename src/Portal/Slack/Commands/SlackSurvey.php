@@ -5,6 +5,7 @@ use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Foundation\Bus\DispatchesCommands;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Queue;
 use MySecurePortal\OldPortal\Classes\Dashboard\Reports\Surveys;
 use Portal\Foundation\Commands\Command;
 use Portal\Slack\Classes\SlackNotification;
@@ -27,7 +28,13 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
     public function callDisplay()
     {
         $this->sendSurveyResults('@' . $this->username);
-        return '_Survey results coming up!_';
+        return 'Survey results coming up!';
+    }
+
+    public function callAnnounce()
+    {
+        $this->sendSurveyResults($this->channelName);
+        return 'Survey results coming up!';
     }
 
 
@@ -47,19 +54,25 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
             'mrkdwn_in' => ['text'],
         ]);
 
-        $this->slack
-            ->to($to)
-            ->from('Survey Team')
-            ->withIcon('http://www.yarramsc.vic.edu.au/wp-content/uploads/2012/07/Survey-Icon.png')
-            ->setAttachments([$fullResults, $partialResults])
-            ->send('');
+        Queue::push(function($job) use($to, $fullResults, $partialResults) {
+            $this->slack
+                ->to($to)
+                ->from('Survey Team')
+                ->withIcon('http://www.yarramsc.vic.edu.au/wp-content/uploads/2012/07/Survey-Icon.png')
+                ->setAttachments([$fullResults, $partialResults])
+                ->send('');
+
+            $job->delete();
+        });
+
+
 
     }
 
 
     public static function __callStatic($name, $args)
     {
-        $name = "call".ucwords($name);
+        $name = "call".ucwords(strtolower($name));
         $thisClass = new Static($args[0]);
 
         if (!method_exists($thisClass, $name)) {
