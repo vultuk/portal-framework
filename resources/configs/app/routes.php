@@ -5,5 +5,6 @@ return [
         'users',
         'companies',
         'orders',
+        'slack',
     ],
 ];
