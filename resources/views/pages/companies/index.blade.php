@@ -1,20 +1,20 @@
 @extends($theme . 'pages.singlepage')
 
-@section('title', trans('portal::companies.index.heading'))
+@section('title', trans( $lang . 'companies.index.heading'))
 
 @section('content')
     <div class="row">
         <div class="col-xs-6 col-xs-offset-6 text-right">
             <div class="btn-group">
                 <button class="btn btn-primary" data-toggle="modal"
-                        data-target="#create-company-modal">{{ trans('portal::companies.index.createButton') }}</button>
+                        data-target="#create-company-modal">{{ trans( $lang . 'companies.index.createButton') }}</button>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="panel panel-default">
-                <div class="panel-heading">{{ trans('portal::companies.index.panels.companies.heading') }}</div>
+                <div class="panel-heading">{{ trans( $lang . 'companies.index.panels.companies.heading') }}</div>
 
                 <table class="table">
                     @foreach ($companies as $company)

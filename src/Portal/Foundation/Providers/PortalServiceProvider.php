@@ -2,6 +2,8 @@
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Portal\Companies\Contracts\CompaniesRepository;
+use Portal\Companies\Contracts\EloquentCompaniesRepository;
 use Portal\Companies\Models\Company;
 use Portal\Scripts\Contracts\ReportRepository;
 use Portal\Scripts\Repositories\Report\CachedReportRepository;
@@ -63,6 +65,7 @@ class PortalServiceProvider extends ServiceProvider {
     {
         $this->bindUsers();
         $this->bindSurveys();
+        $this->bindCompanies();
     }
 
     protected function bindUsers()
@@ -84,6 +87,13 @@ class PortalServiceProvider extends ServiceProvider {
             //$report = new CachedReportRepository($report, $this->app['cache.store']);
 
             return $report;
+        });
+    }
+
+    protected function bindCompanies()
+    {
+        $this->app->bind(['company', CompaniesRepository::class], function(){
+            return new EloquentCompaniesRepository();
         });
     }
 
