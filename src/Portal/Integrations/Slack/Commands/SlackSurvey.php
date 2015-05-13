@@ -49,7 +49,7 @@ class SlackSurvey extends SlackCommand
 
     // *****************************************************************
     // Helper Methods
-    private function sendSingleCampaign(Collection $results, $usergroup)
+    private function sendSingleCampaign(array $results, $usergroup)
     {
         if (count($results) > 0)
         {
@@ -122,7 +122,7 @@ class SlackSurvey extends SlackCommand
 
                 return (new Collection($results))->sortByDesc(function($r) {
                     return $r['full'];
-                })->limit($limit);
+                })->limit($limit)->toArray();
             }
         );
     }
