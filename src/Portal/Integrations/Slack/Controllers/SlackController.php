@@ -29,9 +29,9 @@ class SlackController extends Controller
         $this->userId      = $request->input('user_id');
         $this->command     = str_replace('/', '', $request->input('command'));
 
-        $text = explode(' ', $request->input('text'));
+        $text = explode(' ', trim($request->input('text')));
 
-        $this->action = isset($text[0]) ? $text[0] : null;
+        $this->action = strlen($text[0]) > 0 ? $text[0] : null;
         unset($text[0]);
         $this->text = implode(' ', $text);
     }
@@ -39,7 +39,7 @@ class SlackController extends Controller
     public function slashCommand()
     {
         $slackHandler = "\\Portal\\Integrations\\Slack\\Commands\\Slack" . ucwords($this->command);
-        $slackCommand = $this->action;
+        $slackCommand = !is_null($this->action) ? $this->action : 'help';
 
         return $slackHandler::$slackCommand(
             [
