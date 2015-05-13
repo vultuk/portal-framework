@@ -49,7 +49,7 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
         $details = explode(' ', $this->text);
 
         $count = isset($details[0]) ? $details[0] : 5;
-        $group = isset($details[1]) ? $details[2] : 'LEADGEN';
+        $group = isset($details[1]) ? $details[1] : 'LEADGEN';
 
         $name = ucwords(strtolower($group));
 
