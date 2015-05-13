@@ -25,7 +25,7 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
     protected $action;
     protected $text;
 
-    protected $baseHelp = ['Get Help', 'help', 'Shows this list of commands!'];
+    protected $baseHelp = ['help', 'Shows this list of commands!'];
 
 
     public function callHelp()
@@ -36,7 +36,7 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
         $returnDetails = [];
         foreach ($helpDetails as $detail)
         {
-            $returnDetails[] = $detail[0] . ' : `/' . $this->command . ' ' . $detail[1] . '`` : ' . $detail[2];
+            $returnDetails[] = '`/' . $this->command . ' ' . $detail[0] . '` : ' . $detail[1];
         }
 
         return implode("\n", $returnDetails);
