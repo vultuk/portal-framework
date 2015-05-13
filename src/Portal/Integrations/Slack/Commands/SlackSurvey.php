@@ -1,6 +1,7 @@
 <?php namespace Portal\Integrations\Slack\Commands;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Queue;
 use IlluminateExtensions\Support\Collection;
 use MySecurePortal\OldPortal\Classes\Dashboard\Reports\Surveys;
@@ -22,8 +23,7 @@ class SlackSurvey extends SlackCommand
         $name = ucwords(strtolower($group));
 
         Queue::push(function($job) use($group, $count, $name) {
-            $results = $this->agentList($group, $count);
-            $this->sendSingleCampaign($results, $name);
+            $this->sendSingleCampaign($this->agentList($group, $count), $name);
 
             $job->delete();
         });
@@ -49,7 +49,7 @@ class SlackSurvey extends SlackCommand
 
     // *****************************************************************
     // Helper Methods
-    private function sendSingleCampaign(array $results, $usergroup)
+    private function sendSingleCampaign($results, $usergroup)
     {
         if (count($results) > 0)
         {
@@ -101,7 +101,9 @@ class SlackSurvey extends SlackCommand
         $startDate = is_null($startDate) ? Carbon::now()->hour(0)->minute(0)->second(0) : $startDate;
         $endDate = is_null($endDate) ? Carbon::now()->hour(23)->minute(59)->second(59) : $endDate;
 
-        return $this->cache->remember(
+        $cache = App::make('cache.store');
+
+        return $cache->remember(
             "agentLeaderboard-{$userGroup}-{$limit}-{$startDate}-{$endDate}",
             5,
             function() use($userGroup, $startDate, $endDate, $limit) {
