@@ -1,7 +1,8 @@
-<?php namespace Portal\Slack\Classes;
+<?php namespace Portal\Integrations\Slack\Classes;
 
 use Illuminate\Support\Facades\Config;
 use Maknz\Slack\Attachment;
+use Maknz\Slack\AttachmentField;
 use Maknz\Slack\Client;
 use MySecurePortal\OldPortal\Domain\Users\Models\User;
 use Portal\Notifications\Contracts\Notification;
@@ -18,6 +19,11 @@ class SlackNotification implements Notification {
     public static function attachment(array $settings)
     {
         return new Attachment($settings);
+    }
+
+    public static function attachmentField(array $settings)
+    {
+        return new AttachmentField($settings);
     }
 
     public static function create()
