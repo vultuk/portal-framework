@@ -1,4 +1,4 @@
-<?php namespace Portal\Slack\Commands;
+<?php namespace Portal\Integrations\Slack\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Queue;
 use MySecurePortal\OldPortal\Classes\Dashboard\Reports\Surveys;
 use Portal\Foundation\Commands\Command;
-use Portal\Slack\Classes\SlackNotification;
+use Portal\Integrations\Slack\Classes\SlackNotification;
 
 class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
 {

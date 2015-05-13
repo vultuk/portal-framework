@@ -1,4 +1,4 @@
-<?php namespace Portal\Slack\Classes;
+<?php namespace Portal\Integrations\Slack\Classes;
 
 use Illuminate\Support\Facades\Config;
 use Maknz\Slack\Attachment;

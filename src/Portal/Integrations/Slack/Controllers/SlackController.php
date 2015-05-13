@@ -1,4 +1,4 @@
-<?php namespace Portal\Slack\Controllers;
+<?php namespace Portal\Integrations\Slack\Controllers;
 
 use Illuminate\Foundation\Bus\DispatchesCommands;
 use Illuminate\Http\Request;
@@ -6,6 +6,7 @@ use IlluminateExtensions\Routing\Controller;
 
 class SlackController extends Controller
 {
+
     use DispatchesCommands;
 
     protected $token = null;
@@ -23,33 +24,35 @@ class SlackController extends Controller
 
         $this->token       = $request->input('token');
         $this->channelName = $request->input('channel_name');
-        $this->channelId = $request->input('channel_id');
+        $this->channelId   = $request->input('channel_id');
         $this->username    = $request->input('user_name');
-        $this->userId    = $request->input('user_id');
+        $this->userId      = $request->input('user_id');
         $this->command     = str_replace('/', '', $request->input('command'));
 
         $text = explode(' ', $request->input('text'));
 
         $this->action = isset($text[0]) ? $text[0] : null;
         unset($text[0]);
-        $this->text        = implode(' ', $text);
+        $this->text = implode(' ', $text);
     }
 
     public function slashCommand()
     {
-        $slackHandler = "\\Portal\\Slack\\Commands\\Slack" . ucwords($this->command);
+        $slackHandler = "\\Portal\\Integrations\\Slack\\Commands\\Slack" . ucwords($this->command);
         $slackCommand = $this->action;
 
-        return $slackHandler::$slackCommand([
-            'token' => $this->token,
-            'channelName' => $this->channelName,
-            'channelId' => $this->channelId,
-            'username' => $this->username,
-            'userId' => $this->userId,
-            'command' => $this->command,
-            'action' => $this->action,
-            'text' => $this->text,
-        ]);
+        return $slackHandler::$slackCommand(
+            [
+                'token'       => $this->token,
+                'channelName' => $this->channelName,
+                'channelId'   => $this->channelId,
+                'username'    => $this->username,
+                'userId'      => $this->userId,
+                'command'     => $this->command,
+                'action'      => $this->action,
+                'text'        => $this->text,
+            ]
+        );
     }
 
 }
