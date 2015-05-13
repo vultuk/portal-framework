@@ -19,7 +19,9 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
 
     protected $token;
     protected $channelName;
+    protected $channelId;
     protected $username;
+    protected $userId;
     protected $command;
     protected $action;
     protected $text;
@@ -30,7 +32,9 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
         return implode(', ', [
             $this->token,
             $this->channelName,
+            $this->channelId,
             $this->username,
+            $this->userId,
             $this->command,
             $this->action,
             $this->text,
@@ -40,13 +44,13 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
 
     public function callDisplay()
     {
-        $this->sendSurveyResults('@' . $this->username);
+        $this->sendSurveyResults($this->userId);
         return 'Survey results coming up!';
     }
 
     public function callAnnounce()
     {
-        $this->sendSurveyResults($this->channelName);
+        $this->sendSurveyResults($this->channelId);
         return 'Survey results coming up!';
     }
 
@@ -101,7 +105,9 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
 
         $this->token       = $settings['token'];
         $this->channelName = $settings['channelName'];
+        $this->channelId = $settings['channelId'];
         $this->username    = $settings['username'];
+        $this->userId    = $settings['userId'];
         $this->command     = $settings['command'];
         $this->action      = $settings['action'];
         $this->text        = $settings['text'];
