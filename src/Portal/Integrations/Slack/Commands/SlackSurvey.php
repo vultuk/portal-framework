@@ -1,47 +1,15 @@
 <?php namespace Portal\Integrations\Slack\Commands;
 
 use Carbon\Carbon;
-use Illuminate\Contracts\Bus\SelfHandling;
-use Illuminate\Contracts\Queue\ShouldBeQueued;
-use Illuminate\Foundation\Bus\DispatchesCommands;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Queue;
 use IlluminateExtensions\Support\Collection;
 use MySecurePortal\OldPortal\Classes\Dashboard\Reports\Surveys;
 use MySecurePortal\OldPortal\Models\Vicidial\AgentGroups;
-use Portal\Foundation\Commands\Command;
 use Portal\Integrations\Slack\Classes\SlackNotification;
+use Portal\Integrations\Slack\Contracts\SlackCommand;
 
-class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
+class SlackSurvey extends SlackCommand
 {
-
-    use SerializesModels, DispatchesCommands;
-
-    protected $slack;
-
-    protected $token;
-    protected $channelName;
-    protected $channelId;
-    protected $username;
-    protected $userId;
-    protected $command;
-    protected $action;
-    protected $text;
-
-
-    public function callDebug()
-    {
-        return implode(', ', [
-            $this->token,
-            $this->channelName,
-            $this->channelId,
-            $this->username,
-            $this->userId,
-            $this->command,
-            $this->action,
-            $this->text,
-        ]);
-    }
 
 
     public function callAgents()
@@ -63,6 +31,24 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
         return "Top {$count} {$name} agents coming up!";
     }
 
+
+    public function callDisplay()
+    {
+        $this->sendSurveyResults($this->userId);
+        return 'Survey results coming up!';
+    }
+
+    public function callAnnounce()
+    {
+        $this->sendSurveyResults($this->channelId);
+        return 'Survey results coming up!';
+    }
+
+
+
+
+    // *****************************************************************
+    // Helper Methods
     private function sendSingleCampaign(Collection $results, $usergroup)
     {
         if (count($results) > 0)
@@ -113,44 +99,32 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
     private function agentList($userGroup, $limit = null, Carbon $startDate = null, Carbon $endDate = null)
     {
         $startDate = is_null($startDate) ? Carbon::now()->hour(0)->minute(0)->second(0) : $startDate;
-        $endDate = is_null($endDate) ? Carbon::now() : $endDate;
+        $endDate = is_null($endDate) ? Carbon::now()->hour(23)->minute(59)->second(59) : $endDate;
 
-        $group = AgentGroups::with('agents', 'agents.scriptlog')->find($userGroup);
+        return $this->cache->remember(
+            "agentLeaderboard-{$userGroup}-{$limit}-{$startDate}-{$endDate}",
+            5,
+            function() use($userGroup, $startDate, $endDate, $limit) {
+                $group = AgentGroups::with('agents', 'agents.scriptlog')->find($userGroup);
 
-        $results = [];
+                $results = [];
+                foreach ($group->agents as $agent)
+                {
+                    $fullSurveyCount = $agent->scriptlog()->whereBetween('completed_at', [$startDate, $endDate])->where('status', 'COMPLETE')->count();
+                    $partialSurveyCount = $agent->scriptlog()->whereBetween('completed_at', [$startDate, $endDate])->where('status', 'PARTIAL')->count();
 
-        foreach ($group->agents as $agent)
-        {
-            $fullSurveyCount = $agent->scriptlog()->whereBetween('completed_at', [$startDate, $endDate])->where('status', 'COMPLETE')->count();
-            $partialSurveyCount = $agent->scriptlog()->whereBetween('completed_at', [$startDate, $endDate])->where('status', 'PARTIAL')->count();
+                    $results[] = [
+                        'name' => $agent->full_name,
+                        'full' => $fullSurveyCount,
+                        'part' => $partialSurveyCount,
+                    ];
+                }
 
-            $results[] = [
-                'name' => $agent->full_name,
-                'full' => $fullSurveyCount,
-                'part' => $partialSurveyCount,
-            ];
-
-        }
-
-
-        return (new Collection($results))->sortByDesc(function($r) {
-            return $r['full'];
-        })->limit($limit);
-    }
-
-
-
-
-    public function callDisplay()
-    {
-        $this->sendSurveyResults($this->userId);
-        return 'Survey results coming up!';
-    }
-
-    public function callAnnounce()
-    {
-        $this->sendSurveyResults($this->channelId);
-        return 'Survey results coming up!';
+                return (new Collection($results))->sortByDesc(function($r) {
+                    return $r['full'];
+                })->limit($limit);
+            }
+        );
     }
 
 
@@ -183,33 +157,6 @@ class SlackSurvey extends Command implements SelfHandling, ShouldBeQueued
 
 
 
-    }
-
-
-    public static function __callStatic($name, $args)
-    {
-        $name = "call".ucwords(strtolower($name));
-        $thisClass = new Static($args[0]);
-
-        if (!method_exists($thisClass, $name)) {
-            return "Sorry, I can't do that! :( ". $name;
-        }
-
-        return $thisClass->$name();
-    }
-
-    public function __construct(array $settings)
-    {
-        $this->slack = SlackNotification::create();
-
-        $this->token       = $settings['token'];
-        $this->channelName = $settings['channelName'];
-        $this->channelId = $settings['channelId'];
-        $this->username    = $settings['username'];
-        $this->userId    = $settings['userId'];
-        $this->command     = $settings['command'];
-        $this->action      = $settings['action'];
-        $this->text        = $settings['text'];
     }
 
 }
