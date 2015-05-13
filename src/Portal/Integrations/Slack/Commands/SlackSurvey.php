@@ -12,6 +12,15 @@ use Portal\Integrations\Slack\Contracts\SlackCommand;
 class SlackSurvey extends SlackCommand
 {
 
+    protected function getHelp()
+    {
+        return [
+            ['Show Current Figures', 'display', 'Gets @slackbot to show you the current survey count.'],
+            ['Announce Current Figures', 'announce', 'Announces the current survey count in the current chat window.'],
+            ['Leader Board', 'agents [limit] [user-group]', 'Shows the top [limit] agents from the dialler [user-group].'],
+        ];
+    }
+
 
     public function callAgents()
     {
