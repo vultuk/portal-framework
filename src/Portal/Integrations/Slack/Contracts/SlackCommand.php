@@ -1,12 +1,16 @@
 <?php namespace Portal\Integrations\Slack\Contracts;
 
+use Illuminate\Contracts\Bus\SelfHandling;
+use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Foundation\Bus\DispatchesCommands;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use Portal\Integrations\Slack\Classes\SlackNotification;
+use Portal\Foundation\Commands\Command;
 
-class SlackCommand {
+class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
 
-    use DispatchesCommands;
+    use DispatchesCommands, SerializesModels;
 
     protected $slack;
 
@@ -51,7 +55,6 @@ class SlackCommand {
     public function __construct(array $settings)
     {
         $this->slack = SlackNotification::create();
-        $this->cache = App::make('cache.store');
 
         $this->token       = $settings['token'];
         $this->channelName = $settings['channelName'];
