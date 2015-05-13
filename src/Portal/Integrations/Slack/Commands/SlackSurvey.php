@@ -15,9 +15,9 @@ class SlackSurvey extends SlackCommand
     protected function getHelp()
     {
         return [
-            ['Show Current Figures', 'display', 'Gets @slackbot to show you the current survey count.'],
-            ['Announce Current Figures', 'announce', 'Announces the current survey count in the current chat window.'],
-            ['Leader Board', 'agents [limit] [user-group]', 'Shows the top [limit] agents from the dialler [user-group].'],
+            ['display', 'Gets @slackbot to show you the current survey count.'],
+            ['announce', 'Announces the current survey count in the current chat window.'],
+            ['agents [limit] [user-group]', 'Shows the top _[limit]_ agents from the dialler _[user-group]_.'],
         ];
     }
 
