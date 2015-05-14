@@ -58,7 +58,7 @@ class SlackSurvey extends SlackCommand
 
     // *****************************************************************
     // Helper Methods
-    private function sendSingleCampaign($results, $usergroup)
+    public function sendSingleCampaign($results, $usergroup, $room = null)
     {
         if (count($results) > 0)
         {
@@ -92,9 +92,9 @@ class SlackSurvey extends SlackCommand
                 'mrkdwn_in' => ['text'],
             ]);
 
-            Queue::push(function($job) use($sendResults, $results, $usergroup) {
+            Queue::push(function($job) use($sendResults, $results, $usergroup, $room) {
                 $this->slack
-                    ->to($this->channelId)
+                    ->to(!is_null($room) ? $room : $this->channelId)
                     ->from('Survey Team')
                     ->withIcon('http://www.yarramsc.vic.edu.au/wp-content/uploads/2012/07/Survey-Icon.png')
                     ->setAttachments([$sendResults])
@@ -105,7 +105,7 @@ class SlackSurvey extends SlackCommand
         }
     }
 
-    private function agentList($userGroup, $limit = null, Carbon $startDate = null, Carbon $endDate = null)
+    public function agentList($userGroup, $limit = null, Carbon $startDate = null, Carbon $endDate = null)
     {
         $startDate = is_null($startDate) ? Carbon::now()->hour(0)->minute(0)->second(0) : $startDate;
         $endDate = is_null($endDate) ? Carbon::now()->hour(23)->minute(59)->second(59) : $endDate;

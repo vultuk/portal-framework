@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\App;
 use Portal\Integrations\Slack\Classes\SlackNotification;
 use Portal\Foundation\Commands\Command;
 
-class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
+class SlackCommand extends Command implements SelfHandling, ShouldBeQueued
+{
 
     use DispatchesCommands, SerializesModels;
 
@@ -34,8 +35,7 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
         $helpDetails[] = $this->baseHelp;
 
         $returnDetails = [];
-        foreach ($helpDetails as $detail)
-        {
+        foreach ($helpDetails as $detail) {
             $returnDetails[] = '`/' . $this->command . ' ' . $detail[0] . '` : ' . $detail[1];
         }
 
@@ -63,7 +63,7 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
 
     public static function __callStatic($name, $args)
     {
-        $name = "call".ucwords(strtolower($name));
+        $name = "call" . ucwords(strtolower($name));
         $thisClass = new Static($args[0]);
 
         if (!method_exists($thisClass, $name)) {
@@ -77,14 +77,14 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued {
     {
         $this->slack = SlackNotification::create();
 
-        $this->token       = $settings['token'];
+        $this->token = $settings['token'];
         $this->channelName = $settings['channelName'];
         $this->channelId = $settings['channelId'];
-        $this->username    = $settings['username'];
-        $this->userId    = $settings['userId'];
-        $this->command     = $settings['command'];
-        $this->action      = $settings['action'];
-        $this->text        = $settings['text'];
+        $this->username = $settings['username'];
+        $this->userId = $settings['userId'];
+        $this->command = $settings['command'];
+        $this->action = $settings['action'];
+        $this->text = $settings['text'];
     }
 
 }
