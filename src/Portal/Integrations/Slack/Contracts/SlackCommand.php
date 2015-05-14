@@ -25,6 +25,7 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued
     protected $command;
     protected $action;
     protected $text;
+    protected $splitText;
 
     protected $baseHelp = ['help', 'Shows this list of commands!'];
 
@@ -85,6 +86,8 @@ class SlackCommand extends Command implements SelfHandling, ShouldBeQueued
         $this->command = $settings['command'];
         $this->action = $settings['action'];
         $this->text = $settings['text'];
+
+        $this->splitText = explode(' ', $settings['text']);
     }
 
 }
