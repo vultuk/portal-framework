@@ -1,5 +1,5 @@
 <?php
-namespace Portal\Integrations\Slack\Commands;
+namespace Portal\Integrations\Slack\SlackCommands;
 
 use Illuminate\Support\Facades\Queue;
 use Portal\Integrations\Slack\Contracts\SlackCommand;

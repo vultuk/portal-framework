@@ -1,4 +1,4 @@
-<?php namespace Portal\Integrations\Slack\Commands;
+<?php namespace Portal\Integrations\Slack\SlackCommands;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;

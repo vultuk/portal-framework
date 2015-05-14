@@ -38,7 +38,7 @@ class SlackController extends Controller
 
     public function slashCommand()
     {
-        $slackHandler = "\\Portal\\Integrations\\Slack\\Commands\\Slack" . ucwords($this->command);
+        $slackHandler = "\\Portal\\Integrations\\Slack\\SlackCommands\\Slack" . ucwords($this->command);
         $slackCommand = !is_null($this->action) ? $this->action : 'help';
 
         return $slackHandler::$slackCommand(
