@@ -8,7 +8,7 @@ use Portal\Foundation\Commands\Command;
 use Portal\Integrations\Slack\Classes\SlackNotification;
 use Portal\Integrations\Slack\Models\Choice\DailyResults;
 
-class AddCollection extends Command implements SelfHandling, ShouldBeQueued
+class AddWin extends Command implements SelfHandling, ShouldBeQueued
 {
 
     use SerializesModels;
@@ -17,21 +17,26 @@ class AddCollection extends Command implements SelfHandling, ShouldBeQueued
     protected $slack;
     protected $value;
     protected $slackUser;
+    protected $winPercentage;
+    protected $feeDue;
 
     protected $roomPosts = ['choice-claims', 'directors-chat'];
 
     public function handle()
     {
-        $this->todayInformation->collected       = $this->todayInformation->collected + 1;
-        $this->todayInformation->collected_value = $this->todayInformation->collected_value + $this->value;
+        $this->todayInformation->wins       = $this->todayInformation->wins + 1;
+        $this->todayInformation->win_value  = $this->todayInformation->win_value + $this->value;
+        $this->todayInformation->fees_due   = $this->todayInformation->fees_due + $this->feeDue;
         $this->todayInformation->save();
 
         $formattedValue      = number_format($this->value, 2);
-        $formattedTotalValue = number_format($this->todayInformation->collected_value, 2);
+        $formattedFeeValue   = number_format($this->feeDue, 2);
+        $formattedTotalValue = number_format($this->todayInformation->win_value, 2);
+        $formattedTotalFees  = number_format($this->todayInformation->fees_due, 2);
 
         $this->postMessage(
-            ":tada: :confetti_ball: :balloon: <@{$this->slackUser}> just collected a payment of £{$formattedValue}! :balloon: :confetti_ball: :tada:",
-            "A total of *£{$formattedTotalValue}* has been collected so far today!"
+            ":tada: :confetti_ball: :balloon: <@{$this->slackUser}> just registered a win of £{$formattedValue} and fees due of £{$formattedFeeValue}! :balloon: :confetti_ball: :tada:",
+            "Total wins today: *{$this->todayInformation->wins}* with a value of *£{$formattedTotalValue}* and fees due of *£{$formattedTotalFees}*!"
         );
     }
 
@@ -60,12 +65,15 @@ class AddCollection extends Command implements SelfHandling, ShouldBeQueued
         );
     }
 
-    public function __construct(Carbon $date, $value, $user)
+    public function __construct(Carbon $date, $value, $user, $winPercentage = 30)
     {
         $this->todayInformation = DailyResults::firstOrCreate(['today' => Carbon::now()->format('Y-m-d')]);
         $this->slack            = SlackNotification::create();
         $this->value            = $value;
+        $this->winPercentage    = $winPercentage;
         $this->slackUser        = $user;
+        $this->feeDue           = $value * ($winPercentage / 100);
+
     }
 
 }
