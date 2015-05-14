@@ -118,6 +118,9 @@ class SlackSurvey extends SlackCommand
             function() use($userGroup, $startDate, $endDate, $limit) {
                 $group = AgentGroups::with('agents', 'agents.scriptlog')->find($userGroup);
 
+                if (!isset($group->agents))
+                    return [];
+
                 $results = [];
                 foreach ($group->agents as $agent)
                 {
