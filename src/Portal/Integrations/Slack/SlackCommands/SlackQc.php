@@ -43,7 +43,7 @@ class SlackQc extends SlackCommand
                 ->from('Quality Control')
                 ->withIcon('http://a5.mzstatic.com/us/r30/Purple5/v4/77/7d/87/777d8753-c206-a335-7f33-04435931634f/icon175x175.jpeg')
                 ->send(
-                    preg_replace("/(@\w+)/i", "<$1>", $message)
+                    preg_replace("/(?<=^|(?<=[^a-zA-Z0-9-_\.]))(@\w+)/", "<$1>", $message)
                 );
 
             $job->delete();
