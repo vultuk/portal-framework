@@ -40,9 +40,6 @@ class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued 
             ? $this->scriptResults[$response->script_id]
             : $this->generateScriptResultCollection($response->script_id);
 
-
-
-
         if (!is_null($response->filter)) {
             $scriptResults = $scriptResults->filter(
                 function ($r) use ($response) {
@@ -97,6 +94,7 @@ class SendScriptResults extends Command implements SelfHandling, ShouldBeQueued 
         foreach ($scriptResults as $singleResult)
         {
             $singleReturnResult = [];
+
             array_unshift($questions, 'client.id');
 
             foreach ($questions as $question)
