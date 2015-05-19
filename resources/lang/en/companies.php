@@ -27,4 +27,26 @@
             ],
         ]
     ],
+    'view' => [
+        'noaddress' => 'No addresses added',
+        'addaddress' => 'Add Address',
+    ],
+    'modals' => [
+        'address' => [
+            'heading' => 'Address',
+            'fields' => [
+                'description' => 'Description',
+                'primary' => 'Primary Address',
+                'address1' => 'Address 1',
+                'address2' => 'Address 2',
+                'town' => 'Town/City',
+                'county' => 'County',
+                'postalcode' => 'Postal Code',
+            ],
+            'actions' => [
+                'dismiss' => 'Close',
+                'submit' => 'Save',
+            ]
+        ]
+    ]
 ];
