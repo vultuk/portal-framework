@@ -48,13 +48,14 @@ class CompanyController extends Controller{
 
     public function addAddress(Company $company, AddNewAddress $request)
     {
-        /*$company->addresses()->save(new Address([
+        dd($request->all());
+        $company->addresses()->save(new Address([
             'description' => $request->description,
             'is_primary' => $request->has('is_primary'),
             'address1' => $request->address1,
             'address2' => $request->address2,
             'town_city' => $request->town,
-        ]));*/
+        ]));
 
         dd($request->all());
     }
