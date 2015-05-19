@@ -21,7 +21,7 @@
                 </tr>
                 @foreach ($orders as $order)
                 <tr>
-                    <td>{{ $order->product->name }}</td>
+                    <td>{{ $order->product->name }}<br /><i>{{ !is_null($order->description) ? $order->description : 'No description Given!' }}</i></td>
                     <td>£{{ number_format($order->price, 2) }}</td>
                     <td>{{ $order->status }}</td>
                     <td>{{ $order->created_at->diffForHumans() }}</td>
