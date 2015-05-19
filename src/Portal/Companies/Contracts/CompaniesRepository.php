@@ -2,4 +2,6 @@
 
 interface CompaniesRepository {
 
+    public function addAddress($var);
+
 }
