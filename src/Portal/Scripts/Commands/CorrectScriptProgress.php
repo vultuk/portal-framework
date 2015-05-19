@@ -44,7 +44,7 @@ class CorrectScriptProgress extends Command implements SelfHandling, ShouldBeQue
                     ->withIcon('http://americanredcross.github.io/Guides/CaerusGeo/img/icon_paper.png')
                     ->attach([
                         'title' => $companyName,
-                        'title_link' => 'https://choiceclaims.mysecureportal.net/company/order/view/' . $companySlug,
+                        'title_link' => 'https://choiceclaims.mysecureportal.net/company/' . $companySlug,
                         'fallback' => $companyName . " has almost reached the total amount of leads they purchased.\nThey only have an estimated " . $remaining . ' day'. ($remaining > 1 ? 's' : '') ." remaining.\nThey receive " . $average . ' leads per day and require ' . $remainingLeads. ' more to complete their quota.',
                         'text' => $companyName . " has almost reached the total amount of leads they purchased.\nThey only have an estimated " . $remaining . ' day'. ($remaining > 1 ? 's' : '') ." remaining.\nThey receive " . $average . ' leads per day and require ' . $remainingLeads. ' more to complete their quota.',
                         'color' => 'danger',

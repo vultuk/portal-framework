@@ -16,4 +16,16 @@
                 ],
             ]
         ],
+        'partials' => [
+            'ordertable' => [
+                'heading' => 'Orders',
+                'table' => [
+                    'product' => 'Product',
+                    'value' => 'Value',
+                    'status' => 'Status',
+                    'created' => 'Created',
+                    'completion' => 'Progress',
+                ]
+            ]
+        ],
     ];
