@@ -31,6 +31,8 @@
                                 @if (!is_null($order->completed_at))
                                     Order Completed {{ $order->completed_at->diffForHumans() }}
                                 @else
+
+
                                     Estimated Completion in {{ is_null($order->estimated_completion_time) ? 'Unknown' : $order->estimated_completion_time }} days
                                 @endif
                             </div>
