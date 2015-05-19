@@ -72,7 +72,7 @@ class AddWin extends Command implements SelfHandling, ShouldBeQueued
         $this->value            = $value;
         $this->winPercentage    = $winPercentage;
         $this->slackUser        = $user;
-        $this->feeDue           = $value * ($winPercentage / 100);
+        $this->feeDue           = ($value * ($winPercentage / 100)) * 1.2;
 
     }
 
