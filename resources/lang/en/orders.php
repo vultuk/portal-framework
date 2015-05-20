@@ -25,6 +25,9 @@
                     'status' => 'Status',
                     'created' => 'Created',
                     'completion' => 'Progress',
+                ],
+                'button' => [
+                    'neworder' => 'Create Order',
                 ]
             ]
         ],

@@ -43,7 +43,37 @@
         </tr>
         @endforeach
     </table>
+
+    <div class="panel-footer">
+        <div class="col-xs-6 col-xs-offset-6 text-right">
+            <div class="btn-group">
+                <button class="btn btn-success" data-toggle="modal"
+                        data-target="#create-order-modal">
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                    {{ trans( $lang . 'orders.partials.ordertable.button.neworder') }}</button>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
 </div>
+
+
+
+<div id="create-order-modal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Create Order</h4>
+            </div>
+
+            @include($pages . 'orders.partials.neworder')
+
+        </div>
+    </div>
+</div>
+
 
 <script>
     $(function () {
