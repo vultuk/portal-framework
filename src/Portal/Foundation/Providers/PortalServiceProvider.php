@@ -7,6 +7,7 @@ use Portal\Companies\Contracts\EloquentCompaniesRepository;
 use Portal\Companies\Models\Company;
 use Portal\Scripts\Contracts\ReportRepository;
 
+use Portal\Scripts\Repositories\Report\CachedReportRepository;
 use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
 use Portal\Scripts\Repositories\Report\OldTransformReportRepository;
 
@@ -86,7 +87,7 @@ class PortalServiceProvider extends ServiceProvider {
             $report = new OldEloquentReportRepository();
             $report = new OldTransformReportRepository($report);
 
-            //$report = new CachedReportRepository($report, $this->app['cache.store']);
+            $report = new CachedReportRepository($report, $this->app['cache.store']);
 
             return $report;
         });
