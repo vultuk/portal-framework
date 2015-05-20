@@ -6,8 +6,10 @@ use Portal\Companies\Contracts\CompaniesRepository;
 use Portal\Companies\Contracts\EloquentCompaniesRepository;
 use Portal\Companies\Models\Company;
 use Portal\Scripts\Contracts\ReportRepository;
+
 use Portal\Scripts\Repositories\Report\OldEloquentReportRepository;
 use Portal\Scripts\Repositories\Report\OldTransformReportRepository;
+
 use Portal\Users\Contracts\UserRepository;
 use Portal\Users\Repositories\User\OldEloquentUserRepository;
 use Portal\Users\Repositories\User\OldTransformUserRepository;
@@ -80,7 +82,7 @@ class PortalServiceProvider extends ServiceProvider {
 
     protected function bindSurveys()
     {
-        $this->app->bind(['survey', ReportRepository::class], function() {
+        $this->app->bind(['survey' => ReportRepository::class], function() {
             $report = new OldEloquentReportRepository();
             $report = new OldTransformReportRepository($report);
 
@@ -92,7 +94,7 @@ class PortalServiceProvider extends ServiceProvider {
 
     protected function bindCompanies()
     {
-        $this->app->bind(['company', CompaniesRepository::class], function(){
+        $this->app->bind(['company' => CompaniesRepository::class], function(){
             return new EloquentCompaniesRepository();
         });
     }
