@@ -4,19 +4,28 @@ namespace spec\Portal\Scripts\Classes;
 
 use Carbon\Carbon;
 use PhpSpec\ObjectBehavior;
+use Portal\Scripts\Models\Orders\ScriptResponseOrder;
 use Prophecy\Argument;
 
 class AutomationSpec extends ObjectBehavior
 {
-    function it_is_initializable()
+
+    function let(ScriptResponseOrder $scriptResponseOrder)
     {
         date_default_timezone_set('Europe/London');
+        $this->beConstructedWith($scriptResponseOrder);
+    }
+
+    function it_is_initializable()
+    {
         $this->shouldHaveType('Portal\Scripts\Classes\Automation');
     }
 
 
 
 
+
+    // Date Testing
 
     function it_can_default_start_date_to_today()
     {
