@@ -58,7 +58,7 @@ trait SetsStartAndEndDate {
      *
      * @return null
      */
-    protected function getStartDate()
+    public function getStartDate()
     {
         if (is_null($this->startDate))
         {
@@ -73,7 +73,7 @@ trait SetsStartAndEndDate {
      *
      * @return null
      */
-    protected function getEndDate()
+    public function getEndDate()
     {
         if (is_null($this->endDate))
         {
