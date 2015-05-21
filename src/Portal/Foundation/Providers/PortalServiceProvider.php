@@ -87,7 +87,7 @@ class PortalServiceProvider extends ServiceProvider {
             $report = new OldEloquentReportRepository();
             $report = new OldTransformReportRepository($report);
 
-            $report = new CachedReportRepository($report, $this->app['cache.store']);
+            // $report = new CachedReportRepository($report, $this->app['cache.store']);
 
             return $report;
         });
