@@ -12,9 +12,13 @@
             "email": "j.read@contactrate.co.uk"
         }
     ],
-    "minimum-stability": "dist",
     "require": {
-        "php": ">=5.5.0"
+        "php": ">=5.5.0",
+        "laravel/framework": "5.0.*",
+        "nesbot/carbon": "~1.18"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "~2.0"
     },
     "autoload": {
         "classmap": [],

@@ -23,7 +23,7 @@
                             <td valign="middle">{{ $company->name }}</td>
                             <td valign="middle">
                                 <div class="btn-group" role="group">
-                                    <a href="/company/view/{{ $company->slug }}" class="btn btn-default"
+                                    <a href="/company/{{ $company->slug }}" class="btn btn-default"
                                        aria-label="Left Align">
                                         <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
                                     </a>

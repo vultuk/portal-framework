@@ -2,12 +2,16 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
+use MySecurePortal\OldPortal\Models\Scripts\Question;
+use MySecurePortal\OldPortal\Models\Scripts\Script;
+use Illuminate\Cache\Repository as Cache;
+
 
 class OldSurveyAnswerLog extends Model
 {
 
     protected $table = 'survey_answer_log';
-
 
     public function client()
     {
@@ -19,62 +23,56 @@ class OldSurveyAnswerLog extends Model
         return $this->hasOne('\MySecurePortal\OldPortal\Models\Scripts\Question', 'id', 'question_id');
     }
 
+    public function answer()
+    {
+        return $this->hasOne('\MySecurePortal\OldPortal\Models\Scripts\Option', 'id', 'question_response_id');
+    }
 
 
     public static function getAnswerCountFromSurvey($surveyId, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
-        $thisClass = new Static();
-        list($dateFrom, $dateTo) = $thisClass->setDefaultDates($dateFrom, $dateTo);
+        $cache = App::make('cache.store');
 
-        $query = $thisClass
-            ->with('questionDetails')
-            ->distinct()
-            ->select('question_id')
-            ->where('script_id', $surveyId)
-            ->orderBy('question_id')
-            ->get();
+        return $cache->remember(
+            "surveyPies-{$surveyId}-{$dateFrom}-{$dateTo}",
+            5,
+            function() use($surveyId, $dateFrom, $dateTo) {
+                $responses = Script::with('sections', 'sections.questions', 'sections.questions.options')
+                                   ->find($surveyId);
 
+                $details = [];
+                foreach ($responses->sections as $section)
+                {
+                    if (count($section->questions) > 0)
+                    {
+                        $question = $section->questions[0];
+
+                        $details[$question->id] = [
+                            'question' => $question->name,
+                            'responses' => OldSurveyAnswerLog::getAnswerCountFromQuestion($question, $dateFrom, $dateTo),
+                        ];
+                    }
+                }
+
+                return $details;
+            }
+        );
+
+    }
+
+    public static function getAnswerCountFromQuestion(Question $question, Carbon $dateFrom = null, Carbon $dateTo = null)
+    {
         $details = [];
-        foreach ($query as $result) {
-            $details[$result->question_id] = [
-                'question'  => $result->questionDetails->alias,
-                'responses' => OldSurveyAnswerLog::getAnswerCountFromQuestion($result->question_id, $dateFrom,
-                    $dateTo),
+        foreach ($question->options as $option)
+        {
+            $details[$option->id] = [
+                'response' => $option->value,
+                'count' => $option->responses()->whereBetween('created_at', [$dateFrom, $dateTo])->count(),
             ];
         }
 
         return $details;
     }
-
-    public static function getAnswerCountFromQuestion($questionId, Carbon $dateFrom = null, Carbon $dateTo = null)
-    {
-        $thisClass = new Static();
-        list($dateFrom, $dateTo) = $thisClass->setDefaultDates($dateFrom, $dateTo);
-
-        $query = $thisClass
-            ->with('answerDetails')
-            ->select('question_response_id', \DB::raw("COUNT(lead_id) as total"))
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->where('question_id', $questionId)
-            ->groupBy('question_response_id')
-            ->get();
-
-        $details = [];
-        foreach ($query as $result) {
-            if ($result->question_response_id > 0) {
-                $details[$result->question_response_id] = [
-                    'count'    => $result->total,
-                    'response' => $result->answerDetails->value,
-                ];
-            }
-        }
-
-        return $details;
-    }
-
-
-
-
 
 
     private function setDefaultDates(Carbon $dateFrom = null, Carbon $dateTo = null)

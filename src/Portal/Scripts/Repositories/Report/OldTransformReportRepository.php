@@ -56,44 +56,56 @@ class OldTransformReportRepository implements ReportRepository {
             if (!is_null($result->client)) {
                 $singleInformation = [];
                 if (!isset($resultArray[$result->lead_id])) {
-                    $singleInformation['client.id']          = !is_null($result->client->id) ? $result->client->id : '';
-                    $singleInformation['client.title']       = !is_null(
+                    $singleInformation['client.id']          = !empty($result->client->id) ? $result->client->id : '';
+                    $singleInformation['client.title']       = !empty(
                         $result->client->title
                     ) ? $result->client->title : '';
-                    $singleInformation['client.first_name']  = !is_null(
+                    $singleInformation['client.first_name']  = !empty(
                         $result->client->first_name
                     ) ? $result->client->first_name : '';
-                    $singleInformation['client.last_name']   = !is_null(
+                    $singleInformation['client.last_name']   = !empty(
                         $result->client->last_name
                     ) ? $result->client->last_name : '';
-                    $singleInformation['client.address1']    = !is_null(
+                    $singleInformation['client.address1']    = !empty(
                         $result->client->contactdetails[0]->address1
                     ) ? $result->client->contactdetails[0]->address1 : '';
-                    $singleInformation['client.address2']    = !is_null(
+                    $singleInformation['client.address2']    = !empty(
                         $result->client->contactdetails[0]->address2
                     ) ? $result->client->contactdetails[0]->address2 : '';
-                    $singleInformation['client.address3']    = !is_null(
+                    $singleInformation['client.address3']    = !empty(
                         $result->client->contactdetails[0]->address3
                     ) ? $result->client->contactdetails[0]->address3 : '';
-                    $singleInformation['client.town']        = !is_null(
+                    $singleInformation['client.town']        = !empty(
                         $result->client->contactdetails[0]->town
                     ) ? $result->client->contactdetails[0]->town : '';
-                    $singleInformation['client.county']      = !is_null(
+                    $singleInformation['client.county']      = !empty(
                         $result->client->contactdetails[0]->county
                     ) ? $result->client->contactdetails[0]->county : '';
-                    $singleInformation['client.postal_code'] = !is_null(
+                    $singleInformation['client.postal_code'] = !empty(
                         $result->client->contactdetails[0]->postal_code
                     ) ? $result->client->contactdetails[0]->postal_code : '';
-                    $singleInformation['client.telephone']   = !is_null(
+                    $singleInformation['client.telephone']   = !empty(
                         $result->client->contactdetails[0]->telephone
                     ) ? '0' . $result->client->contactdetails[0]->telephone : '';
-                    $singleInformation['client.mobile']      = !is_null(
+                    $singleInformation['client.mobile']      = !empty(
                         $result->client->contactdetails[0]->mobile
                     ) ? '0' . $result->client->contactdetails[0]->mobile : '';
-                    $singleInformation['client.email']       = !is_null(
+                    $singleInformation['client.email']       = !empty(
                         $result->client->contactdetails[0]->email
                     ) ? $result->client->contactdetails[0]->email : '';
-                    $singleInformation['optin.date']         = !is_null($result->created_at) ? $result->created_at : '';
+                    $singleInformation['optin.date']         = !empty($result->created_at) ? $result->created_at : '';
+
+
+                    $singleInformation['client.landline-mobile']
+                        = !empty($result->client->contactdetails[0]->telephone)
+                        ? $result->client->contactdetails[0]->telephone
+                        : $result->client->contactdetails[0]->mobile;
+
+                    $singleInformation['client.mobile-landline']
+                        = !empty($result->client->contactdetails[0]->mobile)
+                        ? $result->client->contactdetails[0]->mobile
+                        : $result->client->contactdetails[0]->telephone;
+
                 } else {
                     $singleInformation = $resultArray[$result->lead_id];
                 }

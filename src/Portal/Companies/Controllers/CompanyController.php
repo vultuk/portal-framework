@@ -12,7 +12,7 @@ class CompanyController extends Controller{
 
     protected $cache;
 
-    public function __construct(CompaniesRepository $cache)
+    public function __construct(Repository $cache)
     {
         parent::__construct();
         $this->cache = $cache;

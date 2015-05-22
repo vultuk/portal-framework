@@ -1,0 +1,7 @@
+machine:
+  php:
+    version: 5.5.0
+
+test:
+  override:
+    - vendor/phpspec/phpspec/bin/phpspec run
