@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Portal\Integrations\Slack\Commands\Choice\AddCollection;
+use Portal\Integrations\Slack\Commands\Choice\AddPackout;
 use Portal\Integrations\Slack\Commands\Choice\AddWin;
 use Portal\Integrations\Slack\Commands\Choice\ThisMonthSummary;
 use Portal\Integrations\Slack\Contracts\SlackCommand;
@@ -38,6 +39,20 @@ class SlackChoice extends SlackCommand
         return "Your win has been registered!";
     }
 
+    public function callPackout()
+    {
+        if (strlen($this->splitText[0]) < 1)
+            return "You didn't enter the agent who hotkeyed the call!";
+
+        $agentName = str_replace("@", "", $this->splitText[0]);
+
+        $this->dispatch(
+            new AddPackout(Carbon::now(), $agentName, $this->username)
+        );
+
+        return "Your packout has been registered!";
+    }
+
 
     public function callThismonth()
     {
@@ -53,6 +68,7 @@ class SlackChoice extends SlackCommand
     public function getHelp()
     {
         return [
+            ['packout @[agent]', 'Registers a packout hotkeyed across from [agent].'],
             ['collection [value]', 'Registers a collection from a client with a value of [value].'],
             ['win [value] [fee-percentage]', 'Registers a win for a client with a value of [value], if no [fee-percentage] is given it defaults to 30%.'],
             ['thismonth', 'Shows the total wins and collections for the whole of this month.'],
