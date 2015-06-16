@@ -57,6 +57,7 @@ class OldTransformReportRepository implements ReportRepository {
                 $singleInformation = [];
                 if (!isset($resultArray[$result->lead_id])) {
                     $singleInformation['client.id']          = !empty($result->client->id) ? $result->client->id : '';
+                    $singleInformation['client.id.commsave'] = !empty($result->client->id) ? 'NG' . $result->client->id : '';
                     $singleInformation['client.title']       = !empty(
                         $result->client->title
                     ) ? $result->client->title : '';
