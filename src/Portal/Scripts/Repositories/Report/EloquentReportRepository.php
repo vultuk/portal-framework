@@ -23,7 +23,7 @@ class EloquentReportRepository implements ReportRepository {
 
         $query = ScriptLog::select(DB::raw("count(DISTINCT lead_id) as total"))
                     ->whereBetween('created_at', [$dateFrom, $dateTo])
-                    ->where('script_id', $scriptId)
+                    ->where('company_id', $scriptId)
                     ->where('status', $status)
                     ->first();
 
@@ -43,10 +43,13 @@ class EloquentReportRepository implements ReportRepository {
         Carbon $dateTo = null,
         $status = 'COMPLETE'
     ) {
+
+        dd($scriptId);
+
         // Select all the distinct Lead IDs from the answer log
         $query = ScriptLog::select(DB::raw("DATE(created_at) as date, count(DISTINCT lead_id) as total"))
                     ->whereBetween('created_at', [$dateFrom, $dateTo])
-                    ->where('script_id', $scriptId)
+                    ->where('company_id', $scriptId)
                     ->where('status', $status)
                     ->groupBy(DB::raw('DATE(created_at)'))
                     ->get();

@@ -13,7 +13,7 @@ class OldEloquentReportRepository implements ReportRepository {
 
         $query = Log::select(DB::raw("count(DISTINCT lead_id) as total"))
             ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->where('script_id', $scriptId)
+            ->where('company_id', $scriptId)
             ->where('status', $status)
             ->first();
 
@@ -76,7 +76,7 @@ class OldEloquentReportRepository implements ReportRepository {
         // Select all the distinct Lead IDs from the answer log
         $query = Log::select(DB::raw("DATE(created_at) as date, count(DISTINCT lead_id) as total"))
             ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->where('script_id', $scriptId)
+            ->where('company_id', $scriptId)
             ->where('status', $status)
             ->groupBy(DB::raw('DATE(created_at)'))
             ->get();
