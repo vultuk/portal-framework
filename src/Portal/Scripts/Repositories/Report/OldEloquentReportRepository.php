@@ -30,7 +30,7 @@ class OldEloquentReportRepository implements ReportRepository {
         // Select all results from the answer log ready for transforming
         $query = OldSurveyAnswerLog::with('client', 'client.contactdetails', 'question')->select("*")
             ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->where('script_id', $scriptId)
+            //->where('script_id', $scriptId)
             ->get();
 
         // Return all of the results as an Eloquent Collection
