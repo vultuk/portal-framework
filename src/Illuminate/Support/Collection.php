@@ -71,19 +71,27 @@ class Collection extends BaseCollection
         return $postedResults;
     }
 
-    public function toEmail(array $settings)
+    public function toEmail(array $settings, $xls = true)
     {
         \Mail::send('portal::emails.foundation.collection.toemail', [
             'title' => $settings['subject'],
             'total' => $this->count(),
-        ], function ($message) use ($settings) {
+        ], function ($message) use ($settings, $xls) {
             $filename = $settings['filename'] . '_' . Carbon::now()->format('YmdHis');
-            $xl = $this->toXls($filename, false);
+
+            if ($xls)
+            {
+                $extension = '.xls';
+                $xl = $this->toXls($filename, false);
+            } else {
+                $extension = '.csv';
+                $xl = $this->toCsv($filename, false);
+            }
 
             $message->to($settings['to']);
             $message->subject($settings['subject'] . ' - ' . Carbon::now()->format('d/m/Y'));
             $message->from('noreply@mysecureportal.net', 'My Secure Portal');
-            $message->attach(storage_path($this->excelStoragePath) . '/' . $filename . '.xls');
+            $message->attach(storage_path($this->excelStoragePath) . '/' . $filename . $extension);
         });
 
         return $this;
