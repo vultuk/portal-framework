@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
+use MySecurePortal\OldPortal\Domain\Companies\Models\Company;
 use MySecurePortal\OldPortal\Models\Scripts\Question;
 use MySecurePortal\OldPortal\Models\Scripts\Script;
 use Illuminate\Cache\Repository as Cache;
@@ -28,6 +29,10 @@ class OldSurveyAnswerLog extends Model
         return $this->hasOne('\MySecurePortal\OldPortal\Models\Scripts\Option', 'id', 'question_response_id');
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
 
     public static function getAnswerCountFromSurvey($surveyId, Carbon $dateFrom = null, Carbon $dateTo = null)
     {
