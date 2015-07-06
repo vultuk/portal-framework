@@ -64,6 +64,37 @@ class OldEloquentReportRepository implements ReportRepository {
         return $query->toArray();
     }
 
+    public function getSurveyDailyReport()
+    {
+        $todayQuery = Log::with('agent', 'company')
+            ->select('status', 'agent_id', 'company_id')
+            ->whereBetween('completed_at', [
+                (new Carbon())->hour(0)->minute(0)->second(0),
+                (new Carbon())->hour(23)->minute(59)->second(59),
+            ])->get();
+
+        $weekQuery = Log::with('agent', 'company')
+            ->select('status', 'agent_id', 'company_id')
+            ->whereBetween('completed_at', [
+                (new Carbon('this week'))->hour(0)->minute(0)->second(0),
+                (new Carbon())->hour(23)->minute(59)->second(59),
+            ])->get();
+
+        $monthQuery = Log::with('agent', 'company')
+            ->select('status', 'agent_id', 'company_id')
+            ->whereBetween('completed_at', [
+                (new Carbon())->day(1)->hour(0)->minute(0)->second(0),
+                (new Carbon())->hour(23)->minute(59)->second(59),
+            ])->get();
+
+
+        return [
+            'Today' => $todayQuery,
+            'This Week' => $weekQuery,
+            'This Month' => $monthQuery,
+        ];
+    }
+
     /**
      * @param null           $scriptId
      * @param \Carbon\Carbon $dateFrom

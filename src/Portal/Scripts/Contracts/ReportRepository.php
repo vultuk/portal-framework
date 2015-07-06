@@ -5,6 +5,8 @@ use Carbon\Carbon;
 interface ReportRepository
 {
 
+    public function getSurveyDailyReport();
+
     /**
      * @param null           $scriptId
      * @param \Carbon\Carbon $dateFrom
