@@ -36,6 +36,7 @@
             $winsValue = number_format($winsValue, 2);
             $feesDue = number_format($feesDue, 2);
 
+            $this->slack     = SlackNotification::create();
             $this->postMessage(
                 "*Total values for Choice Claims this month are...*",
                 "*Total wins:* {$wins} with a value of £{$winsValue} and a total of £{$feesDue} in fees due\n*Total Collected:* {$collected} with a value of £{$collectedValue}"
@@ -69,7 +70,6 @@
                 'today',
                 [Carbon::now()->day(1)->format('Y-m-d'), Carbon::now()->addDay()->format('Y-m-d')]
             )->get();
-            $this->slack     = SlackNotification::create();
             $this->user = $user;
         }
     }
